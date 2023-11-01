@@ -39,6 +39,11 @@ ACHeroCharacter::ACHeroCharacter()
 	FollowCamera->bUsePawnControlRotation = false;
 }
 
+void ACHeroCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
 void ACHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
