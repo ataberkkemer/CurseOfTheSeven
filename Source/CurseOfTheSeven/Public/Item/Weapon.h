@@ -13,6 +13,8 @@ UCLASS()
 class CURSEOFTHESEVEN_API AWeapon : public AItem
 {
 	GENERATED_BODY()
+public:
+	void Equip(USceneComponent* InParent, FName SocketName);
 
 protected:
 	

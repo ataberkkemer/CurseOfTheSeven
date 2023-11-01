@@ -6,6 +6,7 @@
 // #include "Interfaces/PickupInterface.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "CurseOfTheSeven/CHeroCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 AItem::AItem()
@@ -49,6 +50,13 @@ void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	// {
 	// 	PickupInterface->SetOverlappingItem(this);
 	// }
+
+	ACHeroCharacter* HeroCharacter = Cast<ACHeroCharacter>(OtherActor);
+
+	if(OtherActor)
+	{
+		HeroCharacter->SetOverlapingItem(this);
+	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -58,6 +66,13 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	// {
 	// 	PickupInterface->SetOverlappingItem(nullptr);
 	// }
+
+	ACHeroCharacter* HeroCharacter = Cast<ACHeroCharacter>(OtherActor);
+
+	if(OtherActor)
+	{
+		HeroCharacter->SetOverlapingItem(nullptr);
+	}
 }
 
 void AItem::SpawnPickupSystem()

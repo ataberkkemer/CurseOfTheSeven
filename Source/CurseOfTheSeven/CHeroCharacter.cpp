@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "GameFramework/Controller.h"
+#include "Item/Weapon.h"
 
 ACHeroCharacter::ACHeroCharacter()
 {
@@ -63,6 +64,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Move);
+		EnhancedInputComponent->BindAction(EquipKeyAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Equip);
 	}
 	else
 	{
@@ -88,5 +90,15 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
+	}
+}
+
+void ACHeroCharacter::Equip()
+{
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+
+	if(OverlappingWeapon)
+	{
+		OverlappingWeapon->Equip(GetMesh(),FName("RightHandSocket"));
 	}
 }
