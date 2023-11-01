@@ -6,7 +6,7 @@
 // #include "Interfaces/PickupInterface.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "CurseOfTheSeven/CHeroCharacter.h"
+#include "Character/CHeroCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
 AItem::AItem()

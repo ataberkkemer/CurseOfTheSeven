@@ -4,7 +4,6 @@
 #include "Character/CAnimInstance.h"
 
 #include "Character/CHeroCharacter.h"
-#include "CurseOfTheSeven/CHeroCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 

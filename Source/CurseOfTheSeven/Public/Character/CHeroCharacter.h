@@ -20,6 +20,26 @@ class CURSEOFTHESEVEN_API ACHeroCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+
+public:
+	ACHeroCharacter();
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	//Setter Functions
+	FORCEINLINE void SetOverlapingItem(AItem* Item){ OverlappingItem = Item; }
+	FORCEINLINE void SetCharacterState(AItem* Item){ OverlappingItem = Item; }
+
+	//Getter Functions
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+
+protected:
+	void Move(const FInputActionValue& Value);
+	void Equip();
+	virtual void BeginPlay() override;
+	
 private:
 
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
@@ -42,22 +62,4 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* EquipKeyAction;
 
-public:
-	ACHeroCharacter();
-	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	//Setter Functions
-	FORCEINLINE void SetOverlapingItem(AItem* Item){ OverlappingItem = Item; }
-	FORCEINLINE void SetCharacterState(AItem* Item){ OverlappingItem = Item; }
-
-	//Getter Functions
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-	FORCEINLINE class UCameraComponent* GetCharacterState() const { return FollowCamera; }
-
-protected:
-	void Move(const FInputActionValue& Value);
-	void Equip();
-	virtual void BeginPlay() override;
 };

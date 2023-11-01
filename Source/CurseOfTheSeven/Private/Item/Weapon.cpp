@@ -3,13 +3,10 @@
 
 #include "Item/Weapon.h"
 
-#include "CurseOfTheSeven/CHeroCharacter.h"
-
 void AWeapon::Equip(USceneComponent* InParent, FName SocketName)
 {
 	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
 	ItemMesh->AttachToComponent(InParent, TransformRules, SocketName);
-
 }
 
 void AWeapon::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
