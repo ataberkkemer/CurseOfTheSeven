@@ -2,6 +2,8 @@
 
 
 #include "Character/CAnimInstance.h"
+
+#include "Character/CHeroCharacter.h"
 #include "CurseOfTheSeven/CHeroCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -25,5 +27,6 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if(HeroCharacterMovementComponent)
 	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(HeroCharacterMovementComponent->Velocity);
+		CharacterState = HeroCharacter->GetCharacterState();
 	}
 }
