@@ -27,8 +27,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//Setter Functions
-	FORCEINLINE void SetOverlapingItem(AItem* Item){ OverlappingItem = Item; }
-	FORCEINLINE void SetCharacterState(AItem* Item){ OverlappingItem = Item; }
+	FORCEINLINE void SetOverlapingItem(AItem* Item) { OverlappingItem = Item; }
+	FORCEINLINE void SetCharacterState(AItem* Item) { OverlappingItem = Item; }
 
 	//Getter Functions
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -39,11 +39,10 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Equip();
 	virtual void BeginPlay() override;
-	
-private:
 
+private:
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
-	
+
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
 
@@ -60,6 +59,8 @@ private:
 	UInputAction* MoveAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* EquipKeyAction;
+	UInputAction* JumpAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* EquipKeyAction;
 };

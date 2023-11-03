@@ -26,6 +26,8 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if(HeroCharacterMovementComponent)
 	{
 		GroundSpeed = UKismetMathLibrary::VSizeXY(HeroCharacterMovementComponent->Velocity);
+		AirSpeed = HeroCharacterMovementComponent->Velocity.Z;
+		IsFalling = HeroCharacterMovementComponent->IsFalling();
 		CharacterState = HeroCharacter->GetCharacterState();
 	}
 }
