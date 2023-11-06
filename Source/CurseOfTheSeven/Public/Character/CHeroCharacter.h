@@ -12,6 +12,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class AItem;
+class UAnimMontage;
 struct FInputActionValue;
 
 
@@ -38,10 +39,12 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Equip();
+	void Attack();
 	virtual void BeginPlay() override;
 
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
+	int32 AttackState = 1;
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
@@ -62,5 +65,14 @@ private:
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AttackAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* EquipKeyAction;
+
+	/**
+	 * Animation Montages
+	 * */
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* AttackMontage;
 };

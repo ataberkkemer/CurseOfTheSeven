@@ -66,6 +66,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Move);
 		EnhancedInputComponent->BindAction(EquipKeyAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Equip);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		// EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
 	}
 	else
 	{
@@ -101,5 +102,42 @@ void ACHeroCharacter::Equip()
 	if(OverlappingWeapon)
 	{
 		OverlappingWeapon->Equip(GetMesh(),FName("RightHandSocket"));
+	}
+}
+
+void ACHeroCharacter::Attack()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if(AnimInstance && AttackMontage)
+	{
+		if(AnimInstance->Montage_IsPlaying(AttackMontage))
+		{
+			AttackState = 1;
+			return;
+		}
+		AnimInstance->Montage_Play(AttackMontage);
+		FName SectionName = FName();
+
+		switch (AttackState)
+		{
+		case 1:
+			SectionName = "SwordSlash1";
+			AttackState = 1;
+			break;
+		// case 2:
+		// 	SectionName = "SwordSlash2";
+		// 	AttackState = 1;
+		// 	break;
+		// case 3:
+		// 	SectionName = "SwordSlash3";
+		// 	AttackState = 1;
+		// 	break;
+		default:
+			SectionName = "SwordSlash1";
+			AttackState = 1;
+			break;
+		}
+		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
 	}
 }
