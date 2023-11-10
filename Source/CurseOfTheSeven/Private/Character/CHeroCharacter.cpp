@@ -80,7 +80,12 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
+	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
+	{
+		return;
+	}
 	if (Controller != nullptr)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -99,9 +104,9 @@ void ACHeroCharacter::Equip()
 {
 	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 
-	if(OverlappingWeapon)
+	if (OverlappingWeapon)
 	{
-		OverlappingWeapon->Equip(GetMesh(),FName("RightHandSocket"));
+		OverlappingWeapon->Equip(GetMesh(), FName("RightHandSocket"));
 	}
 }
 
@@ -109,9 +114,9 @@ void ACHeroCharacter::Attack()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	if(AnimInstance && AttackMontage)
+	if (AnimInstance && AttackMontage)
 	{
-		if(AnimInstance->Montage_IsPlaying(AttackMontage))
+		if (AnimInstance->Montage_IsPlaying(AttackMontage))
 		{
 			AttackState = 1;
 			return;
