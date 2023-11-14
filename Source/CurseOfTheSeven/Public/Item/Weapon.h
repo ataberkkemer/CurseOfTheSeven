@@ -6,14 +6,13 @@
 #include "Item/Item.h"
 #include "Weapon.generated.h"
 
-/**
- * 
- */
+class UBoxComponent;
 UCLASS()
 class CURSEOFTHESEVEN_API AWeapon : public AItem
 {
 	GENERATED_BODY()
 public:
+	AWeapon();
 	void Equip(USceneComponent* InParent, FName SocketName);
 
 protected:
@@ -24,4 +23,7 @@ protected:
 
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	                                UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+private:
+	UPROPERTY(VisibleAnywhere, Category="Weapon Properties")
+	UBoxComponent* WeaponBox;
 };

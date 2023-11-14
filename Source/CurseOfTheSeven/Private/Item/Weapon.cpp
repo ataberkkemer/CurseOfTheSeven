@@ -3,6 +3,15 @@
 
 #include "Item/Weapon.h"
 
+#include "Components/BoxComponent.h"
+
+
+AWeapon::AWeapon()
+{
+	WeaponBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Weapon Box"));
+	WeaponBox->SetupAttachment(GetRootComponent());
+}
+
 void AWeapon::Equip(USceneComponent* InParent, FName SocketName)
 {
 	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget, true);
