@@ -18,5 +18,5 @@ class CURSEOFTHESEVEN_API IHitInterface
 	GENERATED_BODY()
 
 public:
-	virtual void GetHit() = 0;
+	virtual void GetHit(const FVector& ImpactPoint) = 0;
 };
