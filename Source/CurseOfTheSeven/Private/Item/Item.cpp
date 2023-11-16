@@ -53,7 +53,7 @@ void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 	ACHeroCharacter* HeroCharacter = Cast<ACHeroCharacter>(OtherActor);
 
-	if(OtherActor)
+	if(HeroCharacter)
 	{
 		HeroCharacter->SetOverlapingItem(this);
 	}
@@ -69,7 +69,7 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 
 	ACHeroCharacter* HeroCharacter = Cast<ACHeroCharacter>(OtherActor);
 
-	if(OtherActor)
+	if(HeroCharacter)
 	{
 		HeroCharacter->SetOverlapingItem(nullptr);
 	}

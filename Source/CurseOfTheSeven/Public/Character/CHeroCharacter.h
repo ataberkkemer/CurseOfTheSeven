@@ -12,6 +12,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class AItem;
+class AWeapon;
 class UAnimMontage;
 struct FInputActionValue;
 
@@ -27,14 +28,17 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//Setter Functions
-	FORCEINLINE void SetOverlapingItem(AItem* Item) { OverlappingItem = Item; }
-	FORCEINLINE void SetCharacterState(AItem* Item) { OverlappingItem = Item; }
-
 	//Getter Functions
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	
+	//Setter Functions
+	FORCEINLINE void SetOverlapingItem(AItem* Item) { OverlappingItem = Item; }
+	FORCEINLINE void SetCharacterState(AItem* Item) { OverlappingItem = Item; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 
 protected:
 	void Move(const FInputActionValue& Value);
@@ -48,6 +52,9 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
+
+	UPROPERTY(VisibleInstanceOnly)
+	AWeapon* EquippedWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
