@@ -18,6 +18,7 @@ public:
 	//Getter Funcions
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox;}
 
+	TArray<AActor*> ActorsToIgnore;
 protected:
 
 	virtual void BeginPlay() override;
@@ -41,4 +42,5 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* BoxTraceEnd;
+	
 };
