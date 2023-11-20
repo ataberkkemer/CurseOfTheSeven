@@ -12,6 +12,7 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "Item/Weapon.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ACHeroCharacter::ACHeroCharacter()
 {
@@ -80,7 +81,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void ACHeroCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
 {
-	if(EquippedWeapon && EquippedWeapon->GetWeaponBox())
+	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
 	{
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
 		EquippedWeapon->ActorsToIgnore.Empty();
@@ -89,7 +90,7 @@ void ACHeroCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collisio
 
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	FVector2D MovementVector =  Value.Get<FVector2D>().GetRotated(-45.f);
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
 	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
@@ -100,10 +101,16 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
-		UE_LOG(LogTemp, Warning, TEXT("rotation is '%d'"), Rotation.Yaw);
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red,
+			                                 FString::Printf(
+				                                 TEXT("movement x: %f, y: %f"), MovementVector.X, MovementVector.Y));
+		}
 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
