@@ -92,11 +92,11 @@ void ABaseEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 
 	FName Section("FrontHit");
 
-	if (Angle >= -45.f && Angle < 90.f)
+	if (Angle >= -45.f && Angle < -135.f)
 	{
 		Section = FName("LeftHit");
 	}
-	else if (Angle < -135.f && Angle > 90.f)
+	else if (Angle >= 45.f && Angle < 135.f)
 	{
 		Section = FName("RightHit");
 	}
