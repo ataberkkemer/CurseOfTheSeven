@@ -50,7 +50,7 @@ void ABaseEnemy::PlayHitReactMontage(const FName& SectionName) const
 	}
 }
 
-void ABaseEnemy::GetHit(const FVector& ImpactPoint)
+void ABaseEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	DirectionalHitReact(ImpactPoint);
 
