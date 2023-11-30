@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Item/Item.h"
+#include "DamageTypes.h"
 #include "Weapon.generated.h"
 
 class UBoxComponent;
@@ -13,12 +14,13 @@ class CURSEOFTHESEVEN_API AWeapon : public AItem
 	GENERATED_BODY()
 public:
 	AWeapon();
-	void Equip(USceneComponent* InParent, FName SocketName);
+	void Equip(USceneComponent* InParent, FName SocketName, AActor* NewOwner, APawn* NewInstigator);
+
+
+	TArray<AActor*> ActorsToIgnore;
 
 	//Getter Funcions
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox;}
-
-	TArray<AActor*> ActorsToIgnore;
 protected:
 
 	virtual void BeginPlay() override;
@@ -45,5 +47,19 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* BoxTraceEnd;
+
+	UPROPERTY(EditAnywhere, Category = "Damage Properties")
+	float RawDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Damage Properties")
+	ElementType ElementDamageType;
+	
+	UPROPERTY(EditAnywhere, Category = "Damage Properties")
+	float ElementalDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Damage Properties")
+	float StaggerDamage;
+	
+	
 	
 };

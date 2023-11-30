@@ -5,8 +5,10 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Character/Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "CurseOfTheSeven/DebugMacros.h"
+#include "Components/WidgetComponent.h"
+#include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -20,12 +22,20 @@ ABaseEnemy::ABaseEnemy()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
+	HealthBarWidget->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
 void ABaseEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	if (HealthBarWidget)
+	{
+		HealthBarWidget->SetHealthBarPercentage(1.f);
+	}
 }
 
 // Called every frame
@@ -52,8 +62,15 @@ void ABaseEnemy::PlayHitReactMontage(const FName& SectionName) const
 
 void ABaseEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	DirectionalHitReact(ImpactPoint);
-
+	if (Attributes && Attributes->IsAlive())
+	{
+		DirectionalHitReact(ImpactPoint);
+	}
+	else
+	{
+		Die();
+	}
+	
 	if (HitSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(
@@ -67,8 +84,45 @@ void ABaseEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 	{
 		HitParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 			GetWorld(), HitParticlesSystem, ImpactPoint);
-		
+
 		HitParticleInstance->Activate();
+	}
+}
+
+float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+                             AActor* DamageCauser)
+{
+	if (Attributes && HealthBarWidget)
+	{
+		Attributes->ReceiveDamage(DamageAmount);
+		HealthBarWidget->SetHealthBarPercentage(Attributes->GetHealthPercent());
+	}
+	return DamageAmount;
+}
+
+void ABaseEnemy::Die()
+{
+	// TODO: Play Death Montage
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+
+		const int32 Selection = FMath::RandRange(0, 1);
+		FName SectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			SectionName = FName("Death1");
+			break;
+		case 1:
+			SectionName = FName("Death2");
+			break;
+		default:
+			break;
+		}
+
+		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
 	}
 }
 
