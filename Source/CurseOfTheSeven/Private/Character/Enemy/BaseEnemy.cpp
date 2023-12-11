@@ -5,9 +5,11 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Character/AI/BaseAIComponent.h"
 #include "Character/Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "CurseOfTheSeven/DebugMacros.h"
 #include "HUD/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -25,6 +27,7 @@ ABaseEnemy::ABaseEnemy()
 
 	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
+	BaseAI = CreateDefaultSubobject<UBaseAIComponent>(TEXT("AIComponent"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 }
 
@@ -35,6 +38,7 @@ void ABaseEnemy::BeginPlay()
 	if (HealthBarWidget)
 	{
 		HealthBarWidget->SetHealthBarPercentage(1.f);
+		HealthBarWidget->SetVisibility(false);
 	}
 }
 
@@ -42,7 +46,17 @@ void ABaseEnemy::BeginPlay()
 void ABaseEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if(CombatTarget)
+	{
+		if (!InTargetRange(CombatTarget, CombatRadius))
+		{
+			CombatTarget = nullptr;
+			SetHealthBarVisibility(false);		
+		}
+	}
 }
+
 
 // Called to bind functionality to input
 void ABaseEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -97,7 +111,21 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		Attributes->ReceiveDamage(DamageAmount);
 		HealthBarWidget->SetHealthBarPercentage(Attributes->GetHealthPercent());
 	}
+	CombatTarget = EventInstigator->GetPawn();
 	return DamageAmount;
+}
+
+AController* ABaseEnemy::GetCharacterController()
+{
+	return GetController();
+}
+
+bool ABaseEnemy::InTargetRange(AActor* Target, double Radius)
+{
+	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
+	DRAW_SPHERE_SingleFrame(GetActorLocation());
+	DRAW_SPHERE_SingleFrame(Target->GetActorLocation());
+	return DistanceToTarget <= Radius;
 }
 
 void ABaseEnemy::Die()
@@ -113,9 +141,11 @@ void ABaseEnemy::Die()
 		switch (Selection)
 		{
 		case 0:
+			DeathPose = EDeathPose::EDP_DeathA;
 			SectionName = FName("Death1");
 			break;
 		case 1:
+			DeathPose = EDeathPose::EDP_DeathB;
 			SectionName = FName("Death2");
 			break;
 		default:
@@ -124,9 +154,12 @@ void ABaseEnemy::Die()
 
 		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
 	}
+	SetHealthBarVisibility(false);	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(2.0f);
 }
 
-void ABaseEnemy::DirectionalHitReact(const FVector& ImpactPoint)
+void ABaseEnemy::DirectionalHitReact(const FVector& ImpactPoint) const
 {
 	const FVector Forward = GetActorForwardVector();
 	const FVector ImpactLower(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
@@ -161,5 +194,13 @@ void ABaseEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 	{
 		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green,
 		                                 FString::Printf(TEXT("%s: %f"), *Section.ToString(), Angle));
+	}
+}
+
+void ABaseEnemy::SetHealthBarVisibility(const bool IsVisible) const
+{
+	if(HealthBarWidget)
+	{
+		HealthBarWidget->SetVisibility(IsVisible);
 	}
 }

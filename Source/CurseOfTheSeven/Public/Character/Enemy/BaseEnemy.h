@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Character/CharacterTypes.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
 #include "BaseEnemy.generated.h"
@@ -12,6 +13,7 @@ class UNiagaraSystem;
 class UAnimMontage;
 class UAttributeComponent;
 class UHealthBarComponent;
+class UBaseAIComponent;
 
 UCLASS()
 class CURSEOFTHESEVEN_API ABaseEnemy : public ACharacter, public IHitInterface
@@ -26,11 +28,17 @@ public:
 	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	
+	bool InTargetRange(AActor* Target, double Radius);
+	AController* GetCharacterController();
+	
 protected:
 	virtual void BeginPlay() override;
 	void PlayHitReactMontage(const FName& SectionName) const;
 	void Die();
 	UNiagaraComponent* HitParticleInstance;
+	
+	UPROPERTY(BlueprintReadOnly)
+	EDeathPose DeathPose = EDeathPose::EDP_Alive;
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
@@ -47,9 +55,19 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	UAttributeComponent* Attributes;
+
+	UPROPERTY(VisibleAnywhere)
+	UBaseAIComponent* BaseAI;
 	
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget;
+
+	UPROPERTY()
+	AActor* CombatTarget;
+
+	UPROPERTY(EditAnywhere)
+	double CombatRadius = 500.f;
 	
-	void DirectionalHitReact(const FVector& ImpactPoint);
+	void DirectionalHitReact(const FVector& ImpactPoint) const;
+	void SetHealthBarVisibility(const bool IsVisible) const;
 };
