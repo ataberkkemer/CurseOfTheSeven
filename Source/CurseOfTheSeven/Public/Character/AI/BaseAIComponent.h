@@ -31,11 +31,23 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Navigation")
 	double PatrolRadius;
+	
+	void MoveToTarget(AActor* Target);
+	AActor* ChoosePatrolTarget();
 
 private:	
 	UPROPERTY(EditDefaultsOnly, Category = "Variables")
 	ABaseEnemy* BaseEnemy;
+
+	FTimerHandle PatrolTimer;
+	void PatrolTimerFinished();
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMin = 5.f;
+
+	UPROPERTY(EditAnywhere, Category = "AI Navigation")
+	float WaitMax = 10.f;
 	
-	
+	void CheckPatrolTarget();
 		
 };
