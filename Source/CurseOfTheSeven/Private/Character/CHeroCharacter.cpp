@@ -13,6 +13,7 @@
 #include "GameFramework/Controller.h"
 #include "Item/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Utility/AnimationComponent.h"
 
 ACHeroCharacter::ACHeroCharacter()
 {
@@ -40,6 +41,8 @@ ACHeroCharacter::ACHeroCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+
+	AnimationComponent = CreateDefaultSubobject<UAnimationComponent>(TEXT("AnimationComponent"));
 }
 
 void ACHeroCharacter::Tick(float DeltaTime)
@@ -68,6 +71,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Move);
 		EnhancedInputComponent->BindAction(EquipKeyAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Equip);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
 		// EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
 	}
 	else
@@ -90,7 +94,7 @@ void ACHeroCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collisio
 
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
-	FVector2D MovementVector =  Value.Get<FVector2D>().GetRotated(-45.f);
+	MovementVector =  Value.Get<FVector2D>().GetRotated(-45.f);
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
 	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
@@ -107,14 +111,21 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red,
-			                                 FString::Printf(
-				                                 TEXT("movement x: %f, y: %f"), MovementVector.X, MovementVector.Y));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Position x: %f, y: %f, z: %f"), GetActorLocation().X,  GetActorLocation().Y,  GetActorLocation().Z));
 		}
 
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
+}
+
+void ACHeroCharacter::Dash()
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Position x: %f, y: %f, z: %f"), GetActorLocation().X,  GetActorLocation().Y,  GetActorLocation().Z));
+	}
+	AnimationComponent->Dash(this, FVector(MovementVector.Y * 500, MovementVector.X * 500, 0.f));
 }
 
 void ACHeroCharacter::Equip()

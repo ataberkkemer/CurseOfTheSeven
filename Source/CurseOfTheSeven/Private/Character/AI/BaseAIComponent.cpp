@@ -21,52 +21,58 @@ void UBaseAIComponent::BeginPlay()
 	BaseEnemy = Cast<ABaseEnemy>(GetOwner());
 	EnemyController = Cast<AAIController>(BaseEnemy->GetCharacterController());
 	
-	if (EnemyController && CurrentPatrolTarget)
-	{
-		FAIMoveRequest MoveRequest;
-		MoveRequest.SetGoalActor(CurrentPatrolTarget);
-		MoveRequest.SetAcceptanceRadius(15.f);
-		FNavPathSharedPtr NavPath;
-		EnemyController->MoveTo(MoveRequest, &NavPath);
-		TArray<FNavPathPoint>& PathPoints = NavPath->GetPathPoints();
-		for (auto& Point : PathPoints)
-		{
-			const FVector& Location = Point.Location;
-			DrawDebugSphere(GetWorld(), Location, 12.f, 12, FColor::Green, false, 10.f);
-		}
-	}
+	MoveToTarget(CurrentPatrolTarget);
 }
 
 
-// Called every frame
-void UBaseAIComponent::TickComponent(float DeltaTime, ELevelTick TickType,
-                                     FActorComponentTickFunction* ThisTickFunction)
+void UBaseAIComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	if (CurrentPatrolTarget && EnemyController)
+	//TODO: Her tickde yapmanın anlamı yok
+	//CheckPatrolTarget();
+}
+
+void UBaseAIComponent::MoveToTarget(AActor* Target)
+{
+	if (EnemyController == nullptr || Target == nullptr) return;
+	FAIMoveRequest MoveRequest;
+	MoveRequest.SetGoalActor(Target);
+	MoveRequest.SetAcceptanceRadius(15.f);
+	EnemyController->MoveTo(MoveRequest);
+}
+
+AActor* UBaseAIComponent::ChoosePatrolTarget()
+{
+	TArray<AActor*> ValidTargets;
+	for (AActor* Target : AllPatrolTargets)
 	{
-		if (BaseEnemy->InTargetRange(CurrentPatrolTarget, PatrolRadius))
+		if (Target != CurrentPatrolTarget)
 		{
-			TArray<AActor*> ValidTargets;
-			for (AActor* Target : AllPatrolTargets)
-			{
-				if (Target != CurrentPatrolTarget)
-				{
-					ValidTargets.AddUnique(Target);
-				}
-			}
-
-			const int32 NumPatrolTargets = ValidTargets.Num();
-			if (NumPatrolTargets > 0)
-			{
-				const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets - 1);
-				AActor* Target = ValidTargets[TargetSelection];
-				CurrentPatrolTarget = Target;
-
-				FAIMoveRequest MoveRequest;
-				MoveRequest.SetGoalActor(CurrentPatrolTarget);
-				MoveRequest.SetAcceptanceRadius(15.f);
-				EnemyController->MoveTo(MoveRequest);
-			}
+			ValidTargets.AddUnique(Target);
 		}
 	}
+
+	const int32 NumPatrolTargets = ValidTargets.Num();
+	if (NumPatrolTargets > 0)
+	{
+		const int32 TargetSelection = FMath::RandRange(0, NumPatrolTargets - 1);
+		return ValidTargets[TargetSelection];
+	}
+	return nullptr;
 }
+
+void UBaseAIComponent::CheckPatrolTarget()
+{
+	if (BaseEnemy->InTargetRange(CurrentPatrolTarget, PatrolRadius))
+	{
+		CurrentPatrolTarget = ChoosePatrolTarget();
+		const float WaitTime = FMath::RandRange(WaitMin, WaitMax);
+		GetOwner()->GetWorldTimerManager().SetTimer(PatrolTimer, this, &UBaseAIComponent::PatrolTimerFinished, WaitTime);
+	}
+}
+
+
+void UBaseAIComponent::PatrolTimerFinished()
+{
+	MoveToTarget(CurrentPatrolTarget);
+}
+

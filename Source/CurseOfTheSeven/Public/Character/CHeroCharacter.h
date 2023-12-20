@@ -14,6 +14,7 @@ class UInputAction;
 class AItem;
 class AWeapon;
 class UAnimMontage;
+class UAnimationComponent;
 struct FInputActionValue;
 
 
@@ -42,6 +43,7 @@ public:
 
 protected:
 	void Move(const FInputActionValue& Value);
+	void Dash();
 	void Equip();
 	void Attack();
 	virtual void BeginPlay() override;
@@ -77,9 +79,19 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* EquipKeyAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DashAction;
+
 	/**
 	 * Animation Montages
 	 * */
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* AttackMontage;
+
+	/// Components
+	UPROPERTY(VisibleAnywhere)
+	UAnimationComponent* AnimationComponent;
+
+	UPROPERTY()
+	FVector2D MovementVector;
 };

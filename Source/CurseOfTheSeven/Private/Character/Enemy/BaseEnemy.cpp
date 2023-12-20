@@ -122,6 +122,7 @@ AController* ABaseEnemy::GetCharacterController()
 
 bool ABaseEnemy::InTargetRange(AActor* Target, double Radius)
 {
+	if (Target == nullptr) return false;
 	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
 	DRAW_SPHERE_SingleFrame(GetActorLocation());
 	DRAW_SPHERE_SingleFrame(Target->GetActorLocation());
@@ -130,7 +131,7 @@ bool ABaseEnemy::InTargetRange(AActor* Target, double Radius)
 
 void ABaseEnemy::Die()
 {
-	// TODO: Play Death Montage
+	// TODO: Override yapıp enemye gore calismak lazim
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && DeathMontage)
 	{
