@@ -18,3 +18,7 @@ DrawDebugPoint(GetWorld(), EndLocation, 15.f, FColor::Red, true); \
 DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, -1.f, 0, 1.f); \
 DrawDebugPoint(GetWorld(), EndLocation, 15.f, FColor::Red, false, -1.f); \
 }
+
+#define DRAW_TEXT_ONSCREEN(Text) if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, Text);
+#define DRAW_TEXT_ONSCREEN_DURATION(Duration, Text) if(GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, FColor::Red, TEXT(Text));
+#define DRAW_TEXT_ONSCREEN_COLOR(Duration, Text, Color) if(GEngine) GEngine->AddOnScreenDebugMessage(-1, Duration, Color, TEXT(Text));

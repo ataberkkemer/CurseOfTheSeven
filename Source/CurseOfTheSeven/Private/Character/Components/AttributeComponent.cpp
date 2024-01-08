@@ -13,8 +13,6 @@ UAttributeComponent::UAttributeComponent()
 void UAttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 }
 
 
