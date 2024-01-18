@@ -30,6 +30,9 @@ private:
 	float Damage;
 	
 	UPROPERTY(EditAnywhere)
+	FVector Size;
+	
+	UPROPERTY(EditAnywhere)
 	float StaggerDamage;
 
 	UPROPERTY(EditAnywhere)

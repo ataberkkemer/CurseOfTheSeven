@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Character/SkillComponent/SkillSlotComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/Controller.h"
 #include "Item/Weapon.h"
@@ -43,6 +44,7 @@ ACHeroCharacter::ACHeroCharacter()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	AnimationComponent = CreateDefaultSubobject<UAnimationComponent>(TEXT("AnimationComponent"));
+	FirstSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("SkillOneSlot"));
 }
 
 void ACHeroCharacter::Tick(float DeltaTime)
@@ -72,6 +74,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(EquipKeyAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Equip);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
+		EnhancedInputComponent->BindAction(FirstSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastFirstSkill);
 		// EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
 	}
 	else
@@ -176,4 +179,9 @@ void ACHeroCharacter::Attack()
 		}
 		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
 	}
+}
+
+void ACHeroCharacter::CastFirstSkill()
+{
+	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
 }

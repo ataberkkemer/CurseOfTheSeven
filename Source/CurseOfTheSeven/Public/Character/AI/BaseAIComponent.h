@@ -36,7 +36,7 @@ protected:
 	AActor* ChoosePatrolTarget();
 
 private:	
-	UPROPERTY(EditDefaultsOnly, Category = "Variables")
+	UPROPERTY(VisibleAnywhere, Category = "Variables")
 	ABaseEnemy* BaseEnemy;
 
 	FTimerHandle PatrolTimer;

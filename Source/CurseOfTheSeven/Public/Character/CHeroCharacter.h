@@ -9,6 +9,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class USkillSlotComponent;
 class UInputMappingContext;
 class UInputAction;
 class AItem;
@@ -46,6 +47,8 @@ protected:
 	void Dash();
 	void Equip();
 	void Attack();
+	void CastFirstSkill();
+	
 	virtual void BeginPlay() override;
 
 private:
@@ -63,7 +66,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
@@ -100,6 +103,9 @@ private:
 	/// Components
 	UPROPERTY(VisibleAnywhere)
 	UAnimationComponent* AnimationComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	USkillSlotComponent* FirstSkillSlotComponent;
 
 	UPROPERTY()
 	FVector2D MovementVector;

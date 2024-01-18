@@ -34,6 +34,11 @@ void ABaseSkill::BeginPlay()
 	}
 }
 
+void ABaseSkill::SetAttributes()
+{
+	
+}
+
 void ABaseSkill::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                        FVector NormalImpulse, const FHitResult& Hit)
 {

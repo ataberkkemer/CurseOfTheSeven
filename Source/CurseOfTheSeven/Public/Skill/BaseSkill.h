@@ -10,6 +10,7 @@ class UBoxComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class USoundBase;
+class UAnimMontage;
 class USkillAttribiuteComponent;
 
 UCLASS()
@@ -21,6 +22,9 @@ public:
 	ABaseSkill();
 
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void SetAttributes();
 	
 	UPROPERTY(VisibleDefaultsOnly)
 	UNiagaraComponent* SkillEffect;
@@ -33,8 +37,10 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Hit Effects")
 	USoundBase* HitSound;
-	
 
+	UPROPERTY(EditAnywhere, Category = "Animation")
+	UAnimMontage* SkillAnimation;
+	
 protected:
 	
 	UPROPERTY(VisibleAnywhere)
@@ -44,6 +50,7 @@ protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 private:
+	
 	UPROPERTY(VisibleAnywhere, Category = "Hit Effects")
 	UNiagaraComponent* HitParticleInstance;
 
