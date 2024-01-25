@@ -26,8 +26,13 @@ void USkillSlotComponent::SpawnSkill(FVector Position, FRotator Rotation)
 	
 	if (OwnerActor->GetWorld() && SlotSkill)
 	{
-		ABaseSkill* SpawnedSkill = OwnerActor->GetWorld()->SpawnActor<ABaseSkill>(SlotSkill, Position + FVector(100.F,100.F,0.F), Rotation);
+		ABaseSkill* SpawnedSkill = OwnerActor->GetWorld()->SpawnActor<ABaseSkill>(SlotSkill, Position, Rotation);
 		SkillInstances.AddUnique(SpawnedSkill);
 	}
+}
+
+UAnimMontage* USkillSlotComponent::GetSkillMontage() const
+{
+	return SlotSkill.GetDefaultObject()->SkillAnimation;
 }
 

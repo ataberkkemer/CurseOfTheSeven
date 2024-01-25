@@ -73,7 +73,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Move);
 		EnhancedInputComponent->BindAction(EquipKeyAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Equip);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
+		//EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
 		EnhancedInputComponent->BindAction(FirstSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastFirstSkill);
 		// EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
 	}
@@ -112,11 +112,6 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Position x: %f, y: %f, z: %f"), GetActorLocation().X,  GetActorLocation().Y,  GetActorLocation().Z));
-		}
-
 		AddMovementInput(ForwardDirection, MovementVector.Y);
 		AddMovementInput(RightDirection, MovementVector.X);
 	}
@@ -124,10 +119,6 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 void ACHeroCharacter::Dash()
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Position x: %f, y: %f, z: %f"), GetActorLocation().X,  GetActorLocation().Y,  GetActorLocation().Z));
-	}
 	AnimationComponent->Dash(this, FVector(MovementVector.Y * 500, MovementVector.X * 500, 0.f));
 }
 
@@ -183,5 +174,21 @@ void ACHeroCharacter::Attack()
 
 void ACHeroCharacter::CastFirstSkill()
 {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance->Montage_IsPlaying(FirstSkillSlotComponent->GetSkillMontage()))
+	{
+		return;
+	}
+	AnimInstance->Montage_Play(FirstSkillSlotComponent->GetSkillMontage());
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnFirstSkill, 1.25f, false);
+	
+}
+
+void ACHeroCharacter::SpawnFirstSkill()
+{
 	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
 }
+
+

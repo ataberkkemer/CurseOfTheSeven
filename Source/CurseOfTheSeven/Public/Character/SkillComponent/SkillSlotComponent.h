@@ -17,6 +17,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SpawnSkill(FVector Position, FRotator Rotation);
+	FORCEINLINE UAnimMontage* GetSkillMontage() const;
 protected:
 	virtual void BeginPlay() override;
 

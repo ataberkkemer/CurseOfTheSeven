@@ -47,7 +47,9 @@ protected:
 	void Dash();
 	void Equip();
 	void Attack();
+	//FirstSkill
 	void CastFirstSkill();
+	void SpawnFirstSkill();
 	
 	virtual void BeginPlay() override;
 
