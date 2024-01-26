@@ -44,7 +44,10 @@ ACHeroCharacter::ACHeroCharacter()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	AnimationComponent = CreateDefaultSubobject<UAnimationComponent>(TEXT("AnimationComponent"));
-	FirstSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("SkillOneSlot"));
+	
+	FirstSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("FirstSkillSlot"));
+	SecondSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("SecondSkillSlot"));
+	UltimateSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("UltimateSkillSlot"));
 }
 
 void ACHeroCharacter::Tick(float DeltaTime)
@@ -75,6 +78,8 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
 		//EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
 		EnhancedInputComponent->BindAction(FirstSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastFirstSkill);
+		EnhancedInputComponent->BindAction(SecondSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastSecondSkill);
+		EnhancedInputComponent->BindAction(UltimateSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastUltimateSkill);
 		// EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
 	}
 	else
@@ -182,13 +187,49 @@ void ACHeroCharacter::CastFirstSkill()
 	AnimInstance->Montage_Play(FirstSkillSlotComponent->GetSkillMontage());
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnFirstSkill, 1.25f, false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnFirstSkill, FirstSkillSlotComponent->GetDelay(), false);
 	
 }
 
 void ACHeroCharacter::SpawnFirstSkill()
 {
 	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
+}
+
+void ACHeroCharacter::CastSecondSkill()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance->Montage_IsPlaying(SecondSkillSlotComponent->GetSkillMontage()))
+	{
+		return;
+	}
+	AnimInstance->Montage_Play(SecondSkillSlotComponent->GetSkillMontage());
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnSecondSkill, FirstSkillSlotComponent->GetDelay(), false);
+}
+
+void ACHeroCharacter::SpawnSecondSkill()
+{
+	SecondSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
+}
+
+void ACHeroCharacter::CastUltimateSkill()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance->Montage_IsPlaying(UltimateSkillSlotComponent->GetSkillMontage()))
+	{
+		return;
+	}
+	AnimInstance->Montage_Play(UltimateSkillSlotComponent->GetSkillMontage());
+
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnUltimateSkill, UltimateSkillSlotComponent->GetDelay(), false);
+}
+
+void ACHeroCharacter::SpawnUltimateSkill()
+{
+	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
 }
 
 

@@ -24,6 +24,7 @@ ABaseSkill::ABaseSkill()
 void ABaseSkill::BeginPlay()
 {
 	Super::BeginPlay();
+	SkillIndex = 0;
 	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ABaseSkill::OnSphereOverlap);
 	SetLifeSpan(LifeSpan);
 	if(ActiveSound)
@@ -42,7 +43,7 @@ void ABaseSkill::SetAttributes()
 }
 
 void ABaseSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor != nullptr && OtherActor != GetOwner())
 	{

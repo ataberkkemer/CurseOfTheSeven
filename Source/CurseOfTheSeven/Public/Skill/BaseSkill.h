@@ -25,7 +25,10 @@ public:
 
 	UFUNCTION()
 	void SetAttributes();
-
+	
+	UPROPERTY(EditDefaultsOnly)
+	float Delay;
+	
 	UPROPERTY(VisibleDefaultsOnly)
 	UNiagaraComponent* SkillEffect;
 
@@ -62,4 +65,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USkillAttribiuteComponent* Attributes;
+
+	int SkillIndex;
 };
