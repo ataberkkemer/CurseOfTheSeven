@@ -213,7 +213,7 @@ void ACHeroCharacter::CastSecondSkill()
 	AnimInstance->Montage_Play(SecondSkillSlotComponent->GetSkillMontage());
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnSecondSkill, FirstSkillSlotComponent->GetDelay(), false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnSecondSkill, SecondSkillSlotComponent->GetDelay(), false);
 }
 
 void ACHeroCharacter::SpawnSecondSkill()
