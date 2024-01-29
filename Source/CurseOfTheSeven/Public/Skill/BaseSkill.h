@@ -6,7 +6,7 @@
 #include "NiagaraActor.h"
 #include "BaseSkill.generated.h"
 
-class UBoxComponent;
+class USphereComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class USoundBase;
@@ -17,7 +17,7 @@ UCLASS()
 class CURSEOFTHESEVEN_API ABaseSkill : public AActor
 {
 	GENERATED_BODY()
-	
+
 public:
 	ABaseSkill();
 
@@ -26,12 +26,15 @@ public:
 	UFUNCTION()
 	void SetAttributes();
 	
+	UPROPERTY(EditDefaultsOnly)
+	float Delay;
+	
 	UPROPERTY(VisibleDefaultsOnly)
 	UNiagaraComponent* SkillEffect;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Active Effects")
 	USoundBase* ActiveSound;
-	
+
 	UPROPERTY(EditAnywhere, Category = "Hit Effects")
 	UNiagaraSystem* HitEffect;
 
@@ -40,23 +43,28 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* SkillAnimation;
-	
+
 protected:
-	
 	UPROPERTY(VisibleAnywhere)
-	UBoxComponent* BoxCollision;
+	USceneComponent* Root;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USphereComponent* SphereCollision;
 
 	UFUNCTION()
-	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	
+	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	                             const FHitResult& SweepResult);
+
 private:
-	
 	UPROPERTY(VisibleAnywhere, Category = "Hit Effects")
 	UNiagaraComponent* HitParticleInstance;
 
 	UPROPERTY(EditAnywhere)
 	float LifeSpan;
-	
+
 	UPROPERTY(VisibleAnywhere)
 	USkillAttribiuteComponent* Attributes;
+
+	int SkillIndex;
 };

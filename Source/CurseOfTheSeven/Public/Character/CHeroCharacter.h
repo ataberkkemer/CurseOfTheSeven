@@ -12,6 +12,7 @@ class UCameraComponent;
 class USkillSlotComponent;
 class UInputMappingContext;
 class UInputAction;
+class ULegacyCameraShake;
 class AItem;
 class AWeapon;
 class UAnimMontage;
@@ -45,9 +46,22 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Dash();
+	
+	UFUNCTION()
 	void Equip();
 	void Attack();
+	
+	//FirstSkill
 	void CastFirstSkill();
+	void SpawnFirstSkill();
+
+	//SecondSkill
+	void CastSecondSkill();
+	void SpawnSecondSkill();
+
+	//UltimateSkill
+	void CastUltimateSkill();
+	void SpawnUltimateSkill();
 	
 	virtual void BeginPlay() override;
 
@@ -64,6 +78,9 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 
+	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULegacyCameraShake> CameraShake;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 	
@@ -77,7 +94,10 @@ private:
 	UInputAction* JumpAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* AttackAction;
+	UInputAction* PrimaryAttackAction;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UInputAction* SecondaryAttackAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* EquipKeyAction;
@@ -106,7 +126,15 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USkillSlotComponent* FirstSkillSlotComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	USkillSlotComponent* SecondSkillSlotComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	USkillSlotComponent* UltimateSkillSlotComponent;
 
 	UPROPERTY()
 	FVector2D MovementVector;
+	
+	void ShakeCamera();
 };

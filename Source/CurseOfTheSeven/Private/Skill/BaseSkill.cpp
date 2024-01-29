@@ -4,7 +4,7 @@
 #include "Skill/BaseSkill.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Components/BoxComponent.h"
+#include "Components/SphereComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -12,8 +12,10 @@
 
 ABaseSkill::ABaseSkill()
 {
-	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
-	SetRootComponent(BoxCollision);
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+	SphereCollision->SetupAttachment(Root);
 	LifeSpan = 5.f;
 
 	Attributes = CreateDefaultSubobject<USkillAttribiuteComponent>(TEXT("Attributes"));
@@ -22,7 +24,8 @@ ABaseSkill::ABaseSkill()
 void ABaseSkill::BeginPlay()
 {
 	Super::BeginPlay();
-	BoxCollision->OnComponentHit.AddDynamic(this, &ABaseSkill::OnHit);
+	SkillIndex = 0;
+	SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ABaseSkill::OnSphereOverlap);
 	SetLifeSpan(LifeSpan);
 	if(ActiveSound)
 	{
@@ -39,18 +42,18 @@ void ABaseSkill::SetAttributes()
 	
 }
 
-void ABaseSkill::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-                       FVector NormalImpulse, const FHitResult& Hit)
+void ABaseSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor != nullptr && OtherActor != GetOwner())
 	{
-		DRAW_TEXT_ONSCREEN(Hit.ImpactPoint.ToString());
+		DRAW_TEXT_ONSCREEN(SweepResult.ImpactPoint.ToString());
 		SetLifeSpan(1.f);
 		if (HitEffect && GetWorld())
 		{
-			//TODO Despawn
+			DRAW_TEXT_ONSCREEN(SweepResult.GetActor()->GetName());
 			HitParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-				GetWorld(), HitEffect, Hit.ImpactPoint);
+				GetWorld(), HitEffect, SweepResult.ImpactPoint);
 
 			HitParticleInstance->Activate();
 
@@ -59,9 +62,10 @@ void ABaseSkill::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimit
 				UGameplayStatics::PlaySoundAtLocation(
 					this,
 					HitSound,
-					Hit.ImpactPoint
+					SweepResult.ImpactPoint
 				);
 			}
 		}
 	}
 }
+

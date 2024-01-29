@@ -155,9 +155,8 @@ void ABaseEnemy::Die()
 
 		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
 	}
-	SetHealthBarVisibility(false);	
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(2.0f);
+
+	SetDead();
 }
 
 void ABaseEnemy::DirectionalHitReact(const FVector& ImpactPoint) const
@@ -204,4 +203,11 @@ void ABaseEnemy::SetHealthBarVisibility(const bool IsVisible) const
 	{
 		HealthBarWidget->SetVisibility(IsVisible);
 	}
+}
+
+void ABaseEnemy::SetDead()
+{
+	SetHealthBarVisibility(false);	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(2.f);
 }

@@ -8,6 +8,10 @@
 #include "Weapon.generated.h"
 
 class UBoxComponent;
+class ULegacyCameraShake;
+
+DECLARE_DELEGATE(FWeaponHit);
+
 UCLASS()
 class CURSEOFTHESEVEN_API AWeapon : public AItem
 {
@@ -15,7 +19,8 @@ class CURSEOFTHESEVEN_API AWeapon : public AItem
 public:
 	AWeapon();
 	void Equip(USceneComponent* InParent, FName SocketName, AActor* NewOwner, APawn* NewInstigator);
-
+	
+	FWeaponHit OnWeaponHit;
 
 	TArray<AActor*> ActorsToIgnore;
 
@@ -50,6 +55,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Damage Properties")
 	float RawDamage;
+	
+	UPROPERTY(EditAnywhere, Category = "Camera")
+	ULegacyCameraShake* CameraShake;
 
 	UPROPERTY(EditAnywhere, Category = "Damage Properties")
 	ElementType ElementDamageType;

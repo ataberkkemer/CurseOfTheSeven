@@ -10,10 +10,10 @@
 AProjectileSkill::AProjectileSkill()
 {
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
-	CreateDefaultSubobject<UArrowComponent>(TEXT("Direction"))->SetupAttachment(GetRootComponent());
+	CreateDefaultSubobject<UArrowComponent>(TEXT("Direction"))->SetupAttachment(Root);
 
 	SkillEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("SkillParticle"));
-	SkillEffect->SetupAttachment(GetRootComponent());
+	SkillEffect->SetupAttachment(Root);
 	
 	Speed = 500.f;
 	MaxSpeed = 500.f;

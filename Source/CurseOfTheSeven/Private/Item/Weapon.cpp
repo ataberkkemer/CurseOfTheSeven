@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "Interfaces/HitInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "LegacyCameraShake.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 
@@ -80,6 +81,7 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		if(HitTarget)
 		{
 			HitTarget->Execute_GetHit(BoxHit.GetActor(),BoxHit.ImpactPoint);
+			OnWeaponHit.Execute();
 		}
 
 		ActorsToIgnore.AddUnique(BoxHit.GetActor());
