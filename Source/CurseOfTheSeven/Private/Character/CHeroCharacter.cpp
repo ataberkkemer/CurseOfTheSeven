@@ -9,11 +9,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "LegacyCameraShake.h"
 #include "Character/SkillComponent/SkillSlotComponent.h"
 #include "Components/BoxComponent.h"
+#include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/Controller.h"
 #include "Item/Weapon.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Utility/AnimationComponent.h"
 
 ACHeroCharacter::ACHeroCharacter()
@@ -67,6 +68,11 @@ void ACHeroCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+}
+
+void ACHeroCharacter::ShakeCamera()
+{
+	GetLocalViewingPlayerController()->ClientStartCameraShake(CameraShake);
 }
 
 void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -137,6 +143,7 @@ void ACHeroCharacter::Equip()
 		CharacterState = ECharacterState::ECS_EquipOneHandedSword;
 		OverlappingItem = nullptr;
 		EquippedWeapon = OverlappingWeapon;
+		OverlappingWeapon->OnWeaponHit.BindUObject(this, &ACHeroCharacter::ShakeCamera);
 	}
 }
 

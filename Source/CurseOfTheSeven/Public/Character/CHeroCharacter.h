@@ -12,6 +12,7 @@ class UCameraComponent;
 class USkillSlotComponent;
 class UInputMappingContext;
 class UInputAction;
+class ULegacyCameraShake;
 class AItem;
 class AWeapon;
 class UAnimMontage;
@@ -45,8 +46,11 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Dash();
+	
+	UFUNCTION()
 	void Equip();
 	void Attack();
+	
 	//FirstSkill
 	void CastFirstSkill();
 	void SpawnFirstSkill();
@@ -73,6 +77,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
+
+	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULegacyCameraShake> CameraShake;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
@@ -128,4 +135,6 @@ private:
 
 	UPROPERTY()
 	FVector2D MovementVector;
+	
+	void ShakeCamera();
 };

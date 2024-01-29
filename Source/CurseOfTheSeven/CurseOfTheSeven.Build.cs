@@ -9,7 +9,8 @@ public class CurseOfTheSeven : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[]
-			{ "Core", "CoreUObject", "Engine", "InputCore", "GeometryCollectionEngine", "Niagara", "UMG", "AIModule" });
+			{ "Core", "CoreUObject", "Engine", "InputCore", "GeometryCollectionEngine", "Niagara", "UMG", "AIModule", "GameplayCameras", "GameplayCameras", "GameplayCameras"
+			});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput" });
 

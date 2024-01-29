@@ -34,19 +34,25 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void PlayHitReactMontage(const FName& SectionName) const;
-	void Die();
+	
 	UNiagaraComponent* HitParticleInstance;
+	
+	virtual void Die();
+	virtual void DirectionalHitReact(const FVector& ImpactPoint) const;
+
+	void SetHealthBarVisibility(const bool IsVisible) const;
+	void SetDead();
 	
 	UPROPERTY(BlueprintReadOnly)
 	EDeathPose DeathPose = EDeathPose::EDP_Alive;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* DeathMontage;
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 	UAnimMontage* HitReactMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	UAnimMontage* DeathMontage;
-	
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
 	
@@ -68,6 +74,4 @@ private:
 	UPROPERTY(EditAnywhere)
 	double CombatRadius = 500.f;
 	
-	void DirectionalHitReact(const FVector& ImpactPoint) const;
-	void SetHealthBarVisibility(const bool IsVisible) const;
 };
