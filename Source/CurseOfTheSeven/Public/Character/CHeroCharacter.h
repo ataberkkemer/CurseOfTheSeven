@@ -35,6 +35,7 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE bool IsCharacterDashing() const { return IsDashing; }
 	
 	//Setter Functions
 	FORCEINLINE void SetOverlapingItem(AItem* Item) { OverlappingItem = Item; }
@@ -46,7 +47,8 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Dash();
-	
+	void SetDash();
+
 	UFUNCTION()
 	void Equip();
 	void Attack();
@@ -136,5 +138,7 @@ private:
 	UPROPERTY()
 	FVector2D MovementVector;
 	
+	bool IsDashing;
+
 	void ShakeCamera();
 };

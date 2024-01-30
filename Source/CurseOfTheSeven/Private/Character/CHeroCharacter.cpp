@@ -15,6 +15,7 @@
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/Controller.h"
 #include "Item/Weapon.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Utility/AnimationComponent.h"
 
 ACHeroCharacter::ACHeroCharacter()
@@ -54,6 +55,14 @@ ACHeroCharacter::ACHeroCharacter()
 void ACHeroCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if(IsDashing)
+	{
+		if(UKismetMathLibrary::Abs(GetVelocity().X) >= 3500.f)
+		{
+			DRAW_TEXT_ONSCREEN(GetVelocity().ToString());
+			IsDashing = false;
+		}
+	}
 }
 
 void ACHeroCharacter::BeginPlay()
@@ -82,7 +91,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Move);
 		EnhancedInputComponent->BindAction(EquipKeyAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Equip);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		//EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
 		EnhancedInputComponent->BindAction(FirstSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastFirstSkill);
 		EnhancedInputComponent->BindAction(SecondSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastSecondSkill);
 		EnhancedInputComponent->BindAction(UltimateSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastUltimateSkill);
@@ -108,9 +117,15 @@ void ACHeroCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collisio
 
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
+	
 	MovementVector =  Value.Get<FVector2D>().GetRotated(-45.f);
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
+	
+	if(IsDashing)
+	{
+		return;
+	}
+	
 	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
 	{
 		return;
@@ -130,7 +145,16 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 void ACHeroCharacter::Dash()
 {
-	AnimationComponent->Dash(this, FVector(MovementVector.Y * 500, MovementVector.X * 500, 0.f));
+	LaunchCharacter(FVector(MovementVector.Y, MovementVector.X, 0.f) * 5000.f,false,false);
+	IsDashing = true;
+	 FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SetDash, 0.5f, false);
+
+}
+
+void ACHeroCharacter::SetDash()
+{
+	IsDashing = false;
 }
 
 void ACHeroCharacter::Equip()
