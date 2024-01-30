@@ -42,13 +42,14 @@ void ABaseSkill::SetAttributes()
 	
 }
 
+
 void ABaseSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor != nullptr && OtherActor != GetOwner())
 	{
 		DRAW_TEXT_ONSCREEN(SweepResult.ImpactPoint.ToString());
-		SetLifeSpan(1.f);
+		SetLifeSpan(3.f);
 		if (HitEffect && GetWorld())
 		{
 			DRAW_TEXT_ONSCREEN(SweepResult.GetActor()->GetName());
