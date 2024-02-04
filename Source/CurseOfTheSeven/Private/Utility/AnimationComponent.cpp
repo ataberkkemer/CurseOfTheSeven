@@ -3,6 +3,10 @@
 
 #include "Utility/AnimationComponent.h"
 
+#include "Components/CapsuleComponent.h"
+#include "CurseOfTheSeven/DebugMacros.h"
+#include "GameFramework/Character.h"
+
 UAnimationComponent::UAnimationComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -14,20 +18,21 @@ void UAnimationComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-
 void UAnimationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	CurveFloatTimeline.TickTimeline(DeltaTime);
+
 }
 
 void UAnimationComponent::TimeLineProgress(float Value)
 {
 	FVector NewLocation = FMath::Lerp(StartPosition, EndPosition, Value);
-	AnimatedActor->SetActorLocation(NewLocation);
+	FHitResult* HitResult = nullptr;
+	AnimatedActor->SetActorLocation(NewLocation, true, HitResult, ETeleportType::None);
 }
 
-void UAnimationComponent::Dash(AActor* Actor, FVector Offset)
+void UAnimationComponent::Dash(ACharacter* Actor, FVector Offset)
 {
 	if(CurveFloat && !CurveFloatTimeline.IsPlaying())
 	{
@@ -40,9 +45,16 @@ void UAnimationComponent::Dash(AActor* Actor, FVector Offset)
 		CurveFloatTimeline.AddInterpFloat(CurveFloat, TimeLineProgress);
 		CurveFloatTimeline.SetLooping(false);
 		CurveFloatTimeline.PlayFromStart();
+		
+		// FTimerHandle UnusedHandle;
+		// AnimatedActor->GetWorldTimerManager().SetTimer(UnusedHandle,this, &UAnimationComponent::DashCallback, 1.f);
 
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Position x: %f, y: %f, z: %f"), AnimatedActor->GetActorLocation().X, AnimatedActor->GetActorLocation().Y, AnimatedActor->GetActorLocation().Z));
+		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Time %f"),));
 	}
+}
+
+float UAnimationComponent::GetDashTime()
+{
+	return CurveFloat->FloatCurve.Keys.Last().Time;
 }
 

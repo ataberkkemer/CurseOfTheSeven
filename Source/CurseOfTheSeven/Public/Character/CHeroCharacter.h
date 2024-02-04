@@ -12,6 +12,7 @@ class UCameraComponent;
 class USkillSlotComponent;
 class UInputMappingContext;
 class UInputAction;
+class UNiagaraComponent;
 class ULegacyCameraShake;
 class AItem;
 class AWeapon;
@@ -35,6 +36,7 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
+	FORCEINLINE bool IsCharacterDashing() const { return IsDashing; }
 	
 	//Setter Functions
 	FORCEINLINE void SetOverlapingItem(AItem* Item) { OverlappingItem = Item; }
@@ -46,7 +48,8 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Dash();
-	
+	void ResetDash();
+
 	UFUNCTION()
 	void Equip();
 	void Attack();
@@ -80,6 +83,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ULegacyCameraShake> CameraShake;
+	
+	UPROPERTY(EditAnywhere, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UNiagaraComponent* DashVFX;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
@@ -136,5 +142,8 @@ private:
 	UPROPERTY()
 	FVector2D MovementVector;
 	
+	bool IsDashing;
+
 	void ShakeCamera();
+	float GetMovementAngle();
 };

@@ -10,11 +10,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "LegacyCameraShake.h"
+#include "NiagaraComponent.h"
 #include "Character/SkillComponent/SkillSlotComponent.h"
 #include "Components/BoxComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/Controller.h"
 #include "Item/Weapon.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Utility/AnimationComponent.h"
 
 ACHeroCharacter::ACHeroCharacter()
@@ -44,8 +46,11 @@ ACHeroCharacter::ACHeroCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
 
+	DashVFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("DashVfx"));
+	DashVFX->SetupAttachment(RootComponent);
+
 	AnimationComponent = CreateDefaultSubobject<UAnimationComponent>(TEXT("AnimationComponent"));
-	
+
 	FirstSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("FirstSkillSlot"));
 	SecondSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("SecondSkillSlot"));
 	UltimateSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("UltimateSkillSlot"));
@@ -54,6 +59,14 @@ ACHeroCharacter::ACHeroCharacter()
 void ACHeroCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (IsDashing)
+	{
+		if (UKismetMathLibrary::Abs(GetVelocity().X) >= 3500.f)
+		{
+			DRAW_TEXT_ONSCREEN(GetVelocity().ToString());
+			IsDashing = false;
+		}
+	}
 }
 
 void ACHeroCharacter::BeginPlay()
@@ -75,6 +88,33 @@ void ACHeroCharacter::ShakeCamera()
 	GetLocalViewingPlayerController()->ClientStartCameraShake(CameraShake);
 }
 
+float ACHeroCharacter::GetMovementAngle()
+{
+	float Angle = 0.f;
+	float DotProduct = UKismetMathLibrary::DotProduct2D(MovementVector, FVector2D(1.f, 0.f));
+	
+	if (MovementVector.Y > 0)
+	{
+		Angle = UKismetMathLibrary::DegAcos(DotProduct);
+
+		if(MovementVector.X < 0)
+		{
+			Angle += 180.f;
+		}
+	}
+	else
+	{
+		Angle = 360 - UKismetMathLibrary::DegAcos(DotProduct);
+
+		if(MovementVector.X > 0)
+		{
+			Angle += 180.f;
+		}
+	}
+	DRAW_TEXT_ONSCREEN(FString::Printf(TEXT("%f"), Angle));
+	return Angle;
+}
+
 void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
@@ -82,10 +122,13 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Move);
 		EnhancedInputComponent->BindAction(EquipKeyAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Equip);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		//EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
-		EnhancedInputComponent->BindAction(FirstSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastFirstSkill);
-		EnhancedInputComponent->BindAction(SecondSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastSecondSkill);
-		EnhancedInputComponent->BindAction(UltimateSkillAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::CastUltimateSkill);
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Dash);
+		EnhancedInputComponent->BindAction(FirstSkillAction, ETriggerEvent::Triggered, this,
+		                                   &ACHeroCharacter::CastFirstSkill);
+		EnhancedInputComponent->BindAction(SecondSkillAction, ETriggerEvent::Triggered, this,
+		                                   &ACHeroCharacter::CastSecondSkill);
+		EnhancedInputComponent->BindAction(UltimateSkillAction, ETriggerEvent::Triggered, this,
+		                                   &ACHeroCharacter::CastUltimateSkill);
 		// EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
 	}
 	else
@@ -108,8 +151,13 @@ void ACHeroCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collisio
 
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
-	MovementVector =  Value.Get<FVector2D>().GetRotated(-45.f);
+	MovementVector = Value.Get<FVector2D>().GetRotated(-45.f);
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (IsDashing)
+	{
+		return;
+	}
 
 	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
 	{
@@ -130,7 +178,18 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 void ACHeroCharacter::Dash()
 {
-	AnimationComponent->Dash(this, FVector(MovementVector.Y * 500, MovementVector.X * 500, 0.f));
+	SetActorRotation(FRotator(0.f,GetMovementAngle(),0.f), ETeleportType::None);
+	IsDashing = true;
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::ResetDash,
+	                                AnimationComponent->GetDashTime() - 0.05f, false);
+	AnimationComponent->Dash(this, FVector(MovementVector.Y, MovementVector.X, 0.f) * 500.f);
+}
+
+void ACHeroCharacter::ResetDash()
+{
+	IsDashing = false;
+	DRAW_TEXT_ONSCREEN(TEXT("Reset"));
 }
 
 void ACHeroCharacter::Equip()
@@ -187,15 +246,15 @@ void ACHeroCharacter::Attack()
 void ACHeroCharacter::CastFirstSkill()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance->Montage_IsPlaying(FirstSkillSlotComponent->GetSkillMontage()))
+	if (AnimInstance->Montage_IsPlaying(FirstSkillSlotComponent->GetSkillMontage()))
 	{
 		return;
 	}
 	AnimInstance->Montage_Play(FirstSkillSlotComponent->GetSkillMontage());
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnFirstSkill, FirstSkillSlotComponent->GetDelay(), false);
-	
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnFirstSkill,
+	                                FirstSkillSlotComponent->GetDelay(), false);
 }
 
 void ACHeroCharacter::SpawnFirstSkill()
@@ -206,14 +265,15 @@ void ACHeroCharacter::SpawnFirstSkill()
 void ACHeroCharacter::CastSecondSkill()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance->Montage_IsPlaying(SecondSkillSlotComponent->GetSkillMontage()))
+	if (AnimInstance->Montage_IsPlaying(SecondSkillSlotComponent->GetSkillMontage()))
 	{
 		return;
 	}
 	AnimInstance->Montage_Play(SecondSkillSlotComponent->GetSkillMontage());
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnSecondSkill, SecondSkillSlotComponent->GetDelay(), false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnSecondSkill,
+	                                SecondSkillSlotComponent->GetDelay(), false);
 }
 
 void ACHeroCharacter::SpawnSecondSkill()
@@ -224,19 +284,18 @@ void ACHeroCharacter::SpawnSecondSkill()
 void ACHeroCharacter::CastUltimateSkill()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if(AnimInstance->Montage_IsPlaying(UltimateSkillSlotComponent->GetSkillMontage()))
+	if (AnimInstance->Montage_IsPlaying(UltimateSkillSlotComponent->GetSkillMontage()))
 	{
 		return;
 	}
 	AnimInstance->Montage_Play(UltimateSkillSlotComponent->GetSkillMontage());
 
 	FTimerHandle UnusedHandle;
-	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnUltimateSkill, UltimateSkillSlotComponent->GetDelay(), false);
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnUltimateSkill,
+	                                UltimateSkillSlotComponent->GetDelay(), false);
 }
 
 void ACHeroCharacter::SpawnUltimateSkill()
 {
 	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
 }
-
-

@@ -29,5 +29,6 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		AirSpeed = HeroCharacterMovementComponent->Velocity.Z;
 		IsFalling = HeroCharacterMovementComponent->IsFalling();
 		CharacterState = HeroCharacter->GetCharacterState();
+		IsDashing = HeroCharacter->IsCharacterDashing();
 	}
 }
