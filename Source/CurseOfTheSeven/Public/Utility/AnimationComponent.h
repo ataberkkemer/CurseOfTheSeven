@@ -21,7 +21,10 @@ public:
 	void TimeLineProgress(float Value);
 
 	UFUNCTION()
-	void Dash(AActor* Actor, FVector Offset);
+	void Dash(ACharacter* Actor, FVector Offset);
+
+	UFUNCTION()
+	float GetDashTime();
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,6 +42,6 @@ protected:
 	
 private:
 	UPROPERTY(VisibleAnywhere)
-	AActor* AnimatedActor = nullptr;
-		
+	ACharacter* AnimatedActor = nullptr;
+
 };

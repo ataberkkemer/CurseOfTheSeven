@@ -12,6 +12,7 @@ class UCameraComponent;
 class USkillSlotComponent;
 class UInputMappingContext;
 class UInputAction;
+class UNiagaraComponent;
 class ULegacyCameraShake;
 class AItem;
 class AWeapon;
@@ -47,7 +48,7 @@ public:
 protected:
 	void Move(const FInputActionValue& Value);
 	void Dash();
-	void SetDash();
+	void ResetDash();
 
 	UFUNCTION()
 	void Equip();
@@ -82,6 +83,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ULegacyCameraShake> CameraShake;
+	
+	UPROPERTY(EditAnywhere, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UNiagaraComponent* DashVFX;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
@@ -141,4 +145,5 @@ private:
 	bool IsDashing;
 
 	void ShakeCamera();
+	float GetMovementAngle();
 };
