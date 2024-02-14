@@ -23,8 +23,7 @@ public:
 
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void SetAttributes();
+	void SetAttributes(float RawDamage, float ElementalDamage, float DamageTickInterval, float StaggerDamage);
 	
 	UPROPERTY(EditDefaultsOnly)
 	float Delay;
@@ -44,6 +43,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* SkillAnimation;
 
+	UPROPERTY(VisibleAnywhere)
+	USkillAttribiuteComponent* Attributes;
+	
 protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
@@ -63,8 +65,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	float LifeSpan;
 
-	UPROPERTY(VisibleAnywhere)
-	USkillAttribiuteComponent* Attributes;
 
 	int SkillIndex;
 };

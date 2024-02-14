@@ -21,6 +21,11 @@ public:
 	FORCEINLINE float GetRawDamage() const { return Damage; }
 	FORCEINLINE float GetElementalDamage() const { return ElementalDamage; }
 	FORCEINLINE float GetStaggerDamage() const { return StaggerDamage; }
+
+	//Setters
+	FORCEINLINE void SetRawDamage(float NewDamage) { Damage = NewDamage ; }
+	FORCEINLINE void SetElementalDamage(float NewDamage) { ElementalDamage = NewDamage; }
+	FORCEINLINE void SetStaggerDamage(float NewDamage) { StaggerDamage = NewDamage; }
 	
 protected:
 	virtual void BeginPlay() override;

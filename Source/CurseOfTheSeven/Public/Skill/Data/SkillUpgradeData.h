@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SkillUpgrade.h"
 #include "Character/Upgrades/Skill/UpgradeTypes.h"
 #include "Engine/DataAsset.h"
 #include "SkillUpgradeData.generated.h"
@@ -17,8 +18,8 @@ class CURSEOFTHESEVEN_API USkillUpgradeData : public UDataAsset
 
 public:
 	UPROPERTY(EditAnywhere, Category = "SkillUpgrades")
-	UpgradeTypes SkillUpgradeType;
+	TArray<FSkillUpgrade> SkillUpgradeData;
 
-	UPROPERTY(EditAnywhere, Category = "SkillUpgrades")
-	float SkillUpgradeValue;
 };
+
+

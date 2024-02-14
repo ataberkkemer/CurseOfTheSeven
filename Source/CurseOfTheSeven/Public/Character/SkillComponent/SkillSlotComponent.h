@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Skill/Data/SkillUpgrade.h"
 #include "SkillSlotComponent.generated.h"
 class ABaseSkill;
+class UNiagaraSystem;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CURSEOFTHESEVEN_API USkillSlotComponent : public UActorComponent
@@ -17,6 +19,9 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SpawnSkill(FVector Position, FRotator Rotation);
+
+	void SetUpgrade(UNiagaraSystem* UpgradedParticle, float RawDamageMultiplier, float ElementalDamageMultiplier, float StaggerDamageMultiplier);
+	void SetSkill(ABaseSkill* BaseSkill);
 	
 	FORCEINLINE UAnimMontage* GetSkillMontage() const;
 	FORCEINLINE float GetDelay() const;
@@ -29,9 +34,14 @@ private:
 	AActor* OwnerActor;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<ABaseSkill> SlotSkill; 
+	TSubclassOf<ABaseSkill> SlotSkill;
+	
+	UPROPERTY()
+	UNiagaraSystem* UpgradedParticle; 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Skill", meta = (AllowPrivateAccess = "true"))
 	TArray<ABaseSkill*> SkillInstances;
+	
+	FAttributeData AttributeData;
 		
 };

@@ -37,9 +37,11 @@ void ABaseSkill::BeginPlay()
 	}
 }
 
-void ABaseSkill::SetAttributes()
+void ABaseSkill::SetAttributes(float RawDamage, float ElementalDamage, float DamageTickInterval, float StaggerDamage)
 {
-	
+	Attributes->SetRawDamage(RawDamage);
+	Attributes->SetElementalDamage(ElementalDamage);
+	Attributes->SetStaggerDamage(StaggerDamage);
 }
 
 
