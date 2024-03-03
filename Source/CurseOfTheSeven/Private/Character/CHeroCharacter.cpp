@@ -16,7 +16,9 @@
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/Controller.h"
 #include "Item/Weapon.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Save/SaveSystem.h"
 #include "Utility/AnimationComponent.h"
 
 ACHeroCharacter::ACHeroCharacter()
@@ -241,6 +243,33 @@ void ACHeroCharacter::Attack()
 		}
 		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
 	}
+}
+
+void ACHeroCharacter::SaveCharacterStatus()
+{
+	if (USaveSystem* SaveGameInstance = Cast<USaveSystem>(UGameplayStatics::CreateSaveGameObject(USaveSystem::StaticClass())))
+	{
+		// Set up the (optional) delegate.
+		FAsyncSaveGameToSlotDelegate SavedDelegate;
+		// USomeUObjectClass::SaveGameDelegateFunction is a void function that takes the following parameters: const FString& SlotName, const int32 UserIndex, bool bSuccess
+		SavedDelegate.BindUObject(this, &ACHeroCharacter::SaveDelegate);
+
+		// Set data on the savegame object.
+		SaveGameInstance->LevelName = GetLevel()->GetName();
+
+		// Start async save process.
+		UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("Player_0"), 0, SavedDelegate);
+	}
+}
+
+void ACHeroCharacter::LoadCharacterStatus()
+{
+}
+
+void ACHeroCharacter::SaveDelegate(const FString& SlotName, int UserIndex, bool IsSuccess)
+{
+	FString result = IsSuccess ? TEXT("success") : TEXT("fail");
+	DRAW_TEXT_ONSCREEN(result + " , " + SlotName + " , " + FString::FromInt(UserIndex));
 }
 
 void ACHeroCharacter::CastFirstSkill()

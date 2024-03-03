@@ -53,6 +53,14 @@ protected:
 	UFUNCTION()
 	void Equip();
 	void Attack();
+
+	UFUNCTION(BlueprintCallable)
+	void SaveCharacterStatus();
+	
+	UFUNCTION(BlueprintCallable)
+	void LoadCharacterStatus();
+	
+	void SaveDelegate(const FString& SlotName, int UserIndex, bool IsSuccess);
 	
 	//FirstSkill
 	void CastFirstSkill();
