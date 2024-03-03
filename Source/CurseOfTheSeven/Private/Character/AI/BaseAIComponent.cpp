@@ -5,6 +5,8 @@
 #include "AIController.h"
 #include "AITypes.h"
 #include "Character/Enemy/BaseEnemy.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
 
 // Sets default values for this component's properties
@@ -20,15 +22,20 @@ void UBaseAIComponent::BeginPlay()
 
 	BaseEnemy = Cast<ABaseEnemy>(GetOwner());
 	EnemyController = Cast<AAIController>(BaseEnemy->GetCharacterController());
-	
-	MoveToTarget(CurrentPatrolTarget);
+	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+
+	if (Player)
+	{
+		MoveToTarget(Player);
+	}
 }
 
 
-void UBaseAIComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UBaseAIComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+                                     FActorComponentTickFunction* ThisTickFunction)
 {
 	//TODO: Her tickde yapmanın anlamı yok
-	//CheckPatrolTarget();
+	CheckPlayer();
 }
 
 void UBaseAIComponent::MoveToTarget(AActor* Target)
@@ -38,6 +45,7 @@ void UBaseAIComponent::MoveToTarget(AActor* Target)
 	MoveRequest.SetGoalActor(Target);
 	MoveRequest.SetAcceptanceRadius(15.f);
 	EnemyController->MoveTo(MoveRequest);
+	BaseEnemy->GetCharacterMovement()->MaxWalkSpeed = 300.f;
 }
 
 AActor* UBaseAIComponent::ChoosePatrolTarget()
@@ -62,7 +70,7 @@ AActor* UBaseAIComponent::ChoosePatrolTarget()
 
 void UBaseAIComponent::CheckPatrolTarget()
 {
-	if (BaseEnemy->InTargetRange(CurrentPatrolTarget, PatrolRadius))
+	if (BaseEnemy->InTargetRange(CurrentPatrolTarget, AttackRadius))
 	{
 		CurrentPatrolTarget = ChoosePatrolTarget();
 		const float WaitTime = FMath::RandRange(WaitMin, WaitMax);
@@ -70,9 +78,22 @@ void UBaseAIComponent::CheckPatrolTarget()
 	}
 }
 
+void UBaseAIComponent::CheckPlayer()
+{
+	if (!BaseEnemy->InTargetRange(Player, AttackRadius))
+	{
+		MoveToTarget(Player);
+		EnemyState = EEnemyState::EES_Chasing;
+		// BaseEnemy->GetWorldTimerManager().SetTimer(PatrolTimer, this, &UBaseAIComponent::PatrolTimerFinished, WaitTime);
+	}
+	else
+	{
+		EnemyState = EEnemyState::EES_Attacking;
+
+	}
+}
 
 void UBaseAIComponent::PatrolTimerFinished()
 {
-	MoveToTarget(CurrentPatrolTarget);
+	MoveToTarget(Player);
 }
-

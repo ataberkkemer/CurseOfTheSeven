@@ -30,8 +30,11 @@ protected:
 	TArray<AActor*> AllPatrolTargets;
 
 	UPROPERTY(EditAnywhere, Category = "Navigation")
-	double PatrolRadius;
+	double AttackRadius;
 	
+	UPROPERTY()
+	ACharacter* Player;
+
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
 
@@ -48,6 +51,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float WaitMax = 10.f;
 	
+	EEnemyState EnemyState = EEnemyState::EES_Chasing;
+	
 	void CheckPatrolTarget();
-		
+	void CheckPlayer();
 };
