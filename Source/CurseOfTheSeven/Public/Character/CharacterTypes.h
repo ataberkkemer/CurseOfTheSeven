@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿
+#pragma once
 
 UENUM(BlueprintType)
 enum class ECharacterState : uint8
@@ -14,4 +15,11 @@ enum class EDeathPose : uint8
 	EDP_Alive UMETA(DisplayName = "Alive"),
 	EDP_DeathA UMETA(DisplayName = "Death_A"),
 	EDP_DeathB UMETA(DisplayName = "Death_B")
+};
+
+UENUM(BlueprintType)
+enum class EEnemyState : uint8
+{
+	EES_Chasing UMETA(DisplayName = "Chasing"),
+	EES_Attacking UMETA(DisplayName = "Attacking")
 };
