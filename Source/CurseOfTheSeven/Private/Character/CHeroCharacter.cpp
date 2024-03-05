@@ -34,7 +34,7 @@ ACHeroCharacter::ACHeroCharacter()
 
 	GetCharacterMovement()->JumpZVelocity = 300.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+	GetCharacterMovement()->MaxWalkSpeed = 800.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
@@ -75,6 +75,8 @@ void ACHeroCharacter::Tick(float DeltaTime)
 			IsDashing = false;
 		}
 	}
+
+	CheckAttack();
 }
 
 void ACHeroCharacter::BeginPlay()
@@ -167,10 +169,7 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 		return;
 	}
 
-	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
-	{
-		return;
-	}
+	
 	if (Controller != nullptr)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -191,7 +190,7 @@ void ACHeroCharacter::Dash()
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::ResetDash,
 	                                AnimationComponent->GetDashTime() - 0.05f, false);
-	AnimationComponent->Dash(this, FVector(MovementVector.Y, MovementVector.X, 0.f) * 500.f);
+	AnimationComponent->Dash(this, FVector(MovementVector.Y, MovementVector.X, 0.f).GetSafeNormal() * 500.f);
 }
 
 void ACHeroCharacter::ResetDash()
@@ -333,4 +332,18 @@ void ACHeroCharacter::CastUltimateSkill()
 void ACHeroCharacter::SpawnUltimateSkill()
 {
 	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
+}
+
+void ACHeroCharacter::CheckAttack()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+	}
+	else if(!AnimInstance->Montage_IsPlaying(AttackMontage))
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 800.f;
+	}
 }

@@ -25,6 +25,9 @@ AWeapon::AWeapon()
 
 	BoxTraceStart->SetupAttachment(GetRootComponent());
 	BoxTraceEnd->SetupAttachment(GetRootComponent());
+
+	RibbonFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Ribbon"));
+	RibbonFX->SetupAttachment(GetRootComponent());
 }
 
 void AWeapon::BeginPlay()

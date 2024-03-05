@@ -77,7 +77,8 @@ protected:
 	//UltimateSkill
 	void CastUltimateSkill();
 	void SpawnUltimateSkill();
-	
+	void CheckAttack();
+
 	virtual void BeginPlay() override;
 
 private:

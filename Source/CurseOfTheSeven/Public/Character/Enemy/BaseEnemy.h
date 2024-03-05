@@ -53,6 +53,9 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget;
+	
+	UPROPERTY(EditAnywhere)
+	UUserWidget* DamageWidget;
 
 	UPROPERTY()
 	AActor* CombatTarget;
