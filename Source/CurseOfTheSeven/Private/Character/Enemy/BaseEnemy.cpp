@@ -28,6 +28,7 @@ ABaseEnemy::ABaseEnemy()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECollisionResponse::ECR_Ignore);
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
+	// FloatingDamageWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("FloatingDamage"));
 	BaseAI = CreateDefaultSubobject<UBaseAIComponent>(TEXT("AIComponent"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 
@@ -113,6 +114,7 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 		Attributes->ReceiveDamage(DamageAmount);
 		HealthBarWidget->SetHealthBarPercentage(Attributes->GetHealthPercent());
 	}
+	OnDamageTaken(DamageAmount);
 	CombatTarget = EventInstigator->GetPawn();
 	return DamageAmount;
 }

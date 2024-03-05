@@ -19,6 +19,7 @@ public:
 	virtual void Die() override;
 	
 	virtual void PlayAttackMontage() override;
+	
 
 protected:
 

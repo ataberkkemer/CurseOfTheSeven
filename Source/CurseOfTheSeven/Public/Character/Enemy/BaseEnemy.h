@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/BaseCharacter.h"
 #include "Character/CharacterTypes.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "BaseEnemy.generated.h"
 
@@ -48,6 +49,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	UBaseAIComponent* BaseAI;
+	
+	UFUNCTION(BlueprintImplementableEvent, Category = "Damage")
+	void OnDamageTaken(int Damage);
 	
 private:
 	
