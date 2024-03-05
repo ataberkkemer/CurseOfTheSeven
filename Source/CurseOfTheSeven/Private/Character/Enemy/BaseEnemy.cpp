@@ -78,7 +78,7 @@ void ABaseEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitte
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
 	if (!IsDead()) ShowHealthBar();
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	
 	StopAttackMontage();
 }
 
@@ -168,11 +168,11 @@ void ABaseEnemy::Die()
 		switch (Selection)
 		{
 		case 0:
-			DeathPose = EDeathPose::EDP_DeathA;
+			//DeathPose = EDeathPose::EDP_DeathA;
 			SectionName = FName("Death1");
 			break;
 		case 1:
-			DeathPose = EDeathPose::EDP_DeathB;
+			//DeathPose = EDeathPose::EDP_DeathB;
 			SectionName = FName("Death2");
 			break;
 		default:

@@ -27,6 +27,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponVFXEnabled(bool isEnabled);
+
+
 	virtual void Attack();
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	bool IsAlive();
@@ -55,8 +59,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	AWeapon* EquippedWeapon;
 
-	UPROPERTY(BlueprintReadOnly)
-	TEnumAsByte<EDeathPose> DeathPose;
+	// UPROPERTY(BlueprintReadOnly)
+	// TEnumAsByte<EDeathPose> DeathPose;
 	
 	UNiagaraComponent* HitParticleInstance;
 
@@ -89,5 +93,4 @@ protected:
 	void SpawnHitParticles(const FVector& ImpactPoint);
 
 	void DisableCapsule();
-
 };

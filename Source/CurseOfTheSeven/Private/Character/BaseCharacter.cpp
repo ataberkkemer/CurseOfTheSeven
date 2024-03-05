@@ -171,4 +171,18 @@ void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collision
 	}
 }
 
+void ABaseCharacter::SetWeaponVFXEnabled(bool isEnabled)
+{
+	if(EquippedWeapon)
+	{
+		if (isEnabled)
+		{
+			EquippedWeapon->RibbonFX->Activate();
+			return;
+		}
+
+		EquippedWeapon->RibbonFX->Deactivate();
+	}
+}
+
 

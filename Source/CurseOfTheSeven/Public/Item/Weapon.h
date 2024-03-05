@@ -28,6 +28,9 @@ public:
 	FWeaponHit OnWeaponHit;
 
 	TArray<AActor*> IgnoreActors;
+	
+	UPROPERTY(EditAnywhere)
+	UNiagaraComponent* RibbonFX;
 
 	//Getter Funcions
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox;}
@@ -62,6 +65,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* BoxTraceStart;
+	
 	
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* BoxTraceEnd;
