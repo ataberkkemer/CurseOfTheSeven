@@ -12,6 +12,7 @@
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "Item/Weapon.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -26,7 +27,6 @@ ABaseEnemy::ABaseEnemy()
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECollisionResponse::ECR_Ignore);
 
-	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	BaseAI = CreateDefaultSubobject<UBaseAIComponent>(TEXT("AIComponent"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
@@ -46,6 +46,9 @@ void ABaseEnemy::BeginPlay()
 		HealthBarWidget->SetHealthBarPercentage(1.f);
 		HealthBarWidget->SetVisibility(false);
 	}
+
+	Tags.Add(FName("Enemy"));
+	
 }
 
 // Called every frame
@@ -70,42 +73,35 @@ void ABaseEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseEnemy::PlayHitReactMontage(const FName& SectionName) const
+void ABaseEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && HitReactMontage)
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
+	if (!IsDead()) ShowHealthBar();
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	StopAttackMontage();
+}
+
+bool ABaseEnemy::IsDead()
+{
+	return Attributes->IsAlive();
+}
+
+void ABaseEnemy::ShowHealthBar()
+{
+	if (HealthBarWidget)
 	{
-		AnimInstance->Montage_Play(HitReactMontage);
-		AnimInstance->Montage_JumpToSection(SectionName, HitReactMontage);
+		HealthBarWidget->SetVisibility(true);
 	}
 }
 
-void ABaseEnemy::GetHit_Implementation(const FVector& ImpactPoint)
+
+void ABaseCharacter::StopAttackMontage()
 {
-	if (Attributes && Attributes->IsAlive())
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
 	{
-		DirectionalHitReact(ImpactPoint);
-	}
-	else
-	{
-		Die();
-	}
-	
-	if (HitSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(
-			this,
-			HitSound,
-			ImpactPoint
-		);
-	}
-
-	if (HitParticlesSystem && GetWorld())
-	{
-		HitParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
-			GetWorld(), HitParticlesSystem, ImpactPoint);
-
-		HitParticleInstance->Activate();
+		AnimInstance->Montage_Stop(0.25f, AttackMontage);
 	}
 }
 
@@ -124,6 +120,30 @@ float ABaseEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 AController* ABaseEnemy::GetCharacterController()
 {
 	return GetController();
+}
+
+void ABaseEnemy::Attack()
+{
+	Super::Attack();
+}
+
+void ABaseEnemy::DirectionalHitReact(const FVector& ImpactPoint)
+{
+	Super::DirectionalHitReact(ImpactPoint);
+}
+
+bool ABaseEnemy::IsAttackPlaying()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance && AttackMontage)
+	{
+		if (AnimInstance->Montage_IsPlaying(AttackMontage))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 bool ABaseEnemy::InTargetRange(AActor* Target, double Radius)
@@ -165,44 +185,6 @@ void ABaseEnemy::Die()
 	SetDead();
 }
 
-void ABaseEnemy::DirectionalHitReact(const FVector& ImpactPoint) const
-{
-	const FVector Forward = GetActorForwardVector();
-	const FVector ImpactLower(ImpactPoint.X, ImpactPoint.Y, GetActorLocation().Z);
-	const FVector ToHit = (ImpactLower - GetActorLocation()).GetSafeNormal();
-
-	const double AngleCosine = FVector::DotProduct(Forward, ToHit);
-	double Angle = FMath::Acos(AngleCosine);
-	Angle = FMath::RadiansToDegrees(Angle);
-
-	//If cross product points down, angle should be negative
-	const FVector CrossProduct = FVector::CrossProduct(Forward, ToHit);
-
-	if (CrossProduct.Z < 0)
-	{
-		Angle *= -1.f;
-	}
-
-	FName Section("FrontHit");
-
-	if (Angle >= -45.f && Angle < -135.f)
-	{
-		Section = FName("LeftHit");
-	}
-	else if (Angle >= 45.f && Angle < 135.f)
-	{
-		Section = FName("RightHit");
-	}
-
-	PlayHitReactMontage(Section);
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Green,
-		                                 FString::Printf(TEXT("%s: %f"), *Section.ToString(), Angle));
-	}
-}
-
 void ABaseEnemy::SetHealthBarVisibility(const bool IsVisible) const
 {
 	if(HealthBarWidget)
@@ -217,3 +199,6 @@ void ABaseEnemy::SetDead()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetLifeSpan(2.f);
 }
+
+
+

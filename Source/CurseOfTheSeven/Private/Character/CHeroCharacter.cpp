@@ -56,6 +56,12 @@ ACHeroCharacter::ACHeroCharacter()
 	FirstSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("FirstSkillSlot"));
 	SecondSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("SecondSkillSlot"));
 	UltimateSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("UltimateSkillSlot"));
+	
+	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 void ACHeroCharacter::Tick(float DeltaTime)
@@ -83,11 +89,19 @@ void ACHeroCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+	
+	Tags.Add(FName("EngageableTarget"));
 }
 
 void ACHeroCharacter::ShakeCamera()
 {
 	GetLocalViewingPlayerController()->ClientStartCameraShake(CameraShake);
+}
+
+void ACHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
+{
+	PlayHitSound(ImpactPoint);
+	SpawnHitParticles(ImpactPoint);
 }
 
 float ACHeroCharacter::GetMovementAngle()
@@ -139,15 +153,6 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		       TEXT(
 			       "'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."
 		       ), *GetNameSafe(this));
-	}
-}
-
-void ACHeroCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
-{
-	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
-	{
-		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedWeapon->ActorsToIgnore.Empty();
 	}
 }
 

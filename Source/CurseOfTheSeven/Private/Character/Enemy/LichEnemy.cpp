@@ -3,10 +3,11 @@
 
 #include "Character/Enemy/LichEnemy.h"
 
-void ALichEnemy::DirectionalHitReact(const FVector& ImpactPoint) const
+void ALichEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
-	PlayHitReactMontage(FName("HitReact"));
+	Super::DirectionalHitReact(ImpactPoint);
 }
+
 void ALichEnemy::Die()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();

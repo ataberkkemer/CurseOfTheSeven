@@ -16,6 +16,9 @@ class CURSEOFTHESEVEN_API UBaseAIComponent : public UActorComponent
 public:	
 	UBaseAIComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	void SetStagger();
+	void ResetStagger();
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,6 +46,8 @@ private:
 	ABaseEnemy* BaseEnemy;
 
 	FTimerHandle PatrolTimer;
+	FTimerHandle StaggerTimer;
+
 	void PatrolTimerFinished();
 
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")

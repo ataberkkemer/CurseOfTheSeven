@@ -14,5 +14,13 @@ class CURSEOFTHESEVEN_API ASkeletonEnemy : public ABaseEnemy
 {
 	GENERATED_BODY()
 
+public:
+	virtual void Attack() override;
+	virtual void Die() override;
 	
+	virtual void PlayAttackMontage() override;
+
+protected:
+
+	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;
 };
