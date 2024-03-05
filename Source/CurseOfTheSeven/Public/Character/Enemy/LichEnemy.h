@@ -15,6 +15,6 @@ class CURSEOFTHESEVEN_API ALichEnemy : public ABaseEnemy
 	GENERATED_BODY()
 
 protected:
-	virtual void DirectionalHitReact(const FVector& ImpactPoint) const override;
+	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;
 	virtual void Die() override;
 };

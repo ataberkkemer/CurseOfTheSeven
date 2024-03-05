@@ -35,7 +35,17 @@ void UBaseAIComponent::TickComponent(float DeltaTime, ELevelTick TickType,
                                      FActorComponentTickFunction* ThisTickFunction)
 {
 	//TODO: Her tickde yapmanın anlamı yok
+
 	CheckPlayer();
+
+	if ((BaseEnemy && BaseEnemy->IsAttackPlaying()) || EnemyState == EEnemyState::EES_Stagger)
+	{
+		BaseEnemy->GetCharacterMovement()->MaxWalkSpeed = 0.f;
+	}
+	else
+	{
+		BaseEnemy->GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	}
 }
 
 void UBaseAIComponent::MoveToTarget(AActor* Target)
@@ -80,20 +90,42 @@ void UBaseAIComponent::CheckPatrolTarget()
 
 void UBaseAIComponent::CheckPlayer()
 {
+	if (EnemyState == EEnemyState::EES_Stagger)
+	{
+		return;
+	}
+
 	if (!BaseEnemy->InTargetRange(Player, AttackRadius))
 	{
 		MoveToTarget(Player);
 		EnemyState = EEnemyState::EES_Chasing;
-		// BaseEnemy->GetWorldTimerManager().SetTimer(PatrolTimer, this, &UBaseAIComponent::PatrolTimerFinished, WaitTime);
+		BaseEnemy->GetWorldTimerManager().SetTimer(PatrolTimer, this, &UBaseAIComponent::PatrolTimerFinished, 1.f);
 	}
 	else
 	{
 		EnemyState = EEnemyState::EES_Attacking;
-
+		BaseEnemy->Attack();
 	}
 }
 
 void UBaseAIComponent::PatrolTimerFinished()
 {
 	MoveToTarget(Player);
+}
+
+void UBaseAIComponent::SetStagger()
+{
+	EnemyState = EEnemyState::EES_Stagger;
+
+	if (StaggerTimer.IsValid())
+	{
+		BaseEnemy->GetWorldTimerManager().ClearTimer(StaggerTimer);
+	}
+	
+	BaseEnemy->GetWorldTimerManager().SetTimer(StaggerTimer, this, &UBaseAIComponent::ResetStagger, 2.f);
+}
+
+void UBaseAIComponent::ResetStagger()
+{
+	EnemyState = EEnemyState::EES_Chasing;
 }

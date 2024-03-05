@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseCharacter.h"
 #include "CharacterTypes.h"
 #include "GameFramework/Character.h"
 #include "CHeroCharacter.generated.h"
@@ -22,7 +23,7 @@ struct FInputActionValue;
 
 
 UCLASS()
-class CURSEOFTHESEVEN_API ACHeroCharacter : public ACharacter
+class CURSEOFTHESEVEN_API ACHeroCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -42,8 +43,7 @@ public:
 	FORCEINLINE void SetOverlapingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE void SetCharacterState(AItem* Item) { OverlappingItem = Item; }
 
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 
 protected:
 	void Move(const FInputActionValue& Value);
@@ -52,7 +52,11 @@ protected:
 
 	UFUNCTION()
 	void Equip();
-	void Attack();
+	virtual void Attack() override;
+	// virtual void PlayAttackMontage() override;
+	// virtual void AttackEnd() override;
+	// virtual bool CanAttack() override;
+
 
 	UFUNCTION(BlueprintCallable)
 	void SaveCharacterStatus();
@@ -82,9 +86,6 @@ private:
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
-
-	UPROPERTY(VisibleInstanceOnly)
-	AWeapon* EquippedWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -127,12 +128,6 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* UltimateSkillAction;
-
-	/**
-	 * Animation Montages
-	 * */
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	UAnimMontage* AttackMontage;
 
 	/// Components
 	UPROPERTY(VisibleAnywhere)
