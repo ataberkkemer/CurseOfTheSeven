@@ -100,8 +100,9 @@ void ACHeroCharacter::ShakeCamera()
 
 void ACHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, Hitter);
+	// PlayHitSound(ImpactPoint);
+	// SpawnHitParticles(ImpactPoint);
 }
 
 float ACHeroCharacter::GetMovementAngle()
