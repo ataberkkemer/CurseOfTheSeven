@@ -44,7 +44,7 @@ void UBaseAIComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 	else
 	{
-		BaseEnemy->GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		BaseEnemy->GetCharacterMovement()->MaxWalkSpeed = 400.f;
 	}
 }
 
@@ -55,7 +55,7 @@ void UBaseAIComponent::MoveToTarget(AActor* Target)
 	MoveRequest.SetGoalActor(Target);
 	MoveRequest.SetAcceptanceRadius(15.f);
 	EnemyController->MoveTo(MoveRequest);
-	BaseEnemy->GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	BaseEnemy->GetCharacterMovement()->MaxWalkSpeed = 400.f;
 }
 
 AActor* UBaseAIComponent::ChoosePatrolTarget()
