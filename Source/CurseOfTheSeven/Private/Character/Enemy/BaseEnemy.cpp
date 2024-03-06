@@ -152,8 +152,8 @@ bool ABaseEnemy::InTargetRange(AActor* Target, double Radius)
 {
 	if (Target == nullptr) return false;
 	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
-	DRAW_SPHERE_SingleFrame(GetActorLocation());
-	DRAW_SPHERE_SingleFrame(Target->GetActorLocation());
+	// DRAW_SPHERE_SingleFrame(GetActorLocation());
+	// DRAW_SPHERE_SingleFrame(Target->GetActorLocation());
 	return DistanceToTarget <= Radius;
 }
 
