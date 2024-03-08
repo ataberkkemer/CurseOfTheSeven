@@ -31,6 +31,7 @@ class CURSEOFTHESEVEN_API ACHeroCharacter : public ABaseCharacter
 public:
 	ACHeroCharacter();
 	virtual void Tick(float DeltaTime) override;
+	void SecondaryAttack();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//Getter Functions
@@ -129,6 +130,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* UltimateSkillAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* SpecialAttackMontage;
 
 	/// Components
 	UPROPERTY(VisibleAnywhere)

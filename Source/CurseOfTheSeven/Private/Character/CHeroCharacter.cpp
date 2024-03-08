@@ -79,6 +79,11 @@ void ACHeroCharacter::Tick(float DeltaTime)
 	CheckAttack();
 }
 
+void ACHeroCharacter::SecondaryAttack()
+{
+	
+}
+
 void ACHeroCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -149,6 +154,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(UltimateSkillAction, ETriggerEvent::Triggered, this,
 		                                   &ACHeroCharacter::CastUltimateSkill);
 		// EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
+		EnhancedInputComponent->BindAction(SecondaryAttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::SecondaryAttack);
 	}
 	else
 	{
@@ -338,9 +344,10 @@ void ACHeroCharacter::CheckAttack()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
+	bool IsAnimPlaying = AnimInstance && (AnimInstance->Montage_IsPlaying(AttackMontage) || AnimInstance->Montage_IsPlaying(SpecialAttackMontage));
 	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
 	{
-		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		GetCharacterMovement()->MaxWalkSpeed = 0.f;
 	}
 	else if(!AnimInstance->Montage_IsPlaying(AttackMontage))
 	{
