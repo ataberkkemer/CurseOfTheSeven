@@ -6,6 +6,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Character/Components/AttributeComponent.h"
+#include "Character/Components/CharacterStateComponent.h"
 #include "Components/BoxComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "Item/Weapon.h"
@@ -18,6 +19,7 @@ ABaseCharacter::ABaseCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	Attributes = CreateDefaultSubobject<UAttributeComponent>(TEXT("Attributes"));
+	CharacterState = CreateDefaultSubobject<UCharacterStateComponent>(TEXT("CharacterState"));
 }
 
 // Called when the game starts or when spawned
