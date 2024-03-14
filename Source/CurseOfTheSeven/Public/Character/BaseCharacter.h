@@ -11,6 +11,7 @@
 class UNiagaraComponent;
 class AWeapon;
 class UAttributeComponent;
+class UCharacterStateComponent;
 class UAnimMontage;
 class UNiagaraSystem;
 
@@ -82,7 +83,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* Attributes;
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UCharacterStateComponent* CharacterState;
+	
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
 

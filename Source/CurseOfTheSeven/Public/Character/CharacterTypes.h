@@ -10,6 +10,15 @@ enum class ECharacterState : uint8
 };
 
 UENUM(BlueprintType)
+enum class ECharacterMovementState : uint8
+{
+	ECMS_Idle UMETA(DisplayName = "Idle"),
+	ECMS_Running UMETA(DisplayName = "Running"),
+	ECMS_Dashing UMETA(DisplayName = "Dashing"),
+	ECMS_Attacking UMETA(DisplayName = "Attacking")
+};
+
+UENUM(BlueprintType)
 enum class EDeathPose : uint8
 {
 	EDP_Alive UMETA(DisplayName = "Alive"),

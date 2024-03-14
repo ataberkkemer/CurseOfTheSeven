@@ -82,6 +82,9 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool IsDashing;
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
 	int32 AttackState = 1;
@@ -149,8 +152,6 @@ private:
 
 	UPROPERTY()
 	FVector2D MovementVector;
-	
-	bool IsDashing;
 
 	void ShakeCamera();
 	float GetMovementAngle();
