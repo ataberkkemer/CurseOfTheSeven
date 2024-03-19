@@ -21,7 +21,6 @@ class UAnimMontage;
 class UAnimationComponent;
 struct FInputActionValue;
 
-
 UCLASS()
 class CURSEOFTHESEVEN_API ACHeroCharacter : public ABaseCharacter
 {
@@ -39,6 +38,7 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 	FORCEINLINE bool IsCharacterDashing() const { return IsDashing; }
+	FORCEINLINE bool IsCharacterAttacking() const { return (IsDashing && IsAttacking); }
 	
 	//Setter Functions
 	FORCEINLINE void SetOverlapingItem(AItem* Item) { OverlappingItem = Item; }
@@ -54,6 +54,7 @@ protected:
 	UFUNCTION()
 	void Equip();
 	virtual void Attack() override;
+	void ResetAttack();
 	// virtual void PlayAttackMontage() override;
 	// virtual void AttackEnd() override;
 	// virtual bool CanAttack() override;
@@ -85,6 +86,10 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool IsDashing;
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool IsAttacking;
+	FTimerHandle AttackHandle;
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
 	int32 AttackState = 1;
@@ -116,6 +121,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* PrimaryAttackAction;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+    UInputAction* AttackAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
     UInputAction* SecondaryAttackAction;
 
@@ -152,7 +160,7 @@ private:
 
 	UPROPERTY()
 	FVector2D MovementVector;
-
+	
 	void ShakeCamera();
 	float GetMovementAngle();
 };

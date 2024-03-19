@@ -30,5 +30,6 @@ void UCAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		IsFalling = HeroCharacterMovementComponent->IsFalling();
 		CharacterState = HeroCharacter->GetCharacterState();
 		IsDashing = HeroCharacter->IsCharacterDashing();
+		IsDashAttacking = HeroCharacter->IsCharacterAttacking();
 	}
 }

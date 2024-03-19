@@ -56,7 +56,7 @@ ACHeroCharacter::ACHeroCharacter()
 	FirstSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("FirstSkillSlot"));
 	SecondSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("SecondSkillSlot"));
 	UltimateSkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("UltimateSkillSlot"));
-	
+
 	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
@@ -81,7 +81,6 @@ void ACHeroCharacter::Tick(float DeltaTime)
 
 void ACHeroCharacter::SecondaryAttack()
 {
-	
 }
 
 void ACHeroCharacter::BeginPlay()
@@ -96,7 +95,6 @@ void ACHeroCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
 	Tags.Add(FName("EngageableTarget"));
 }
 
@@ -116,12 +114,12 @@ float ACHeroCharacter::GetMovementAngle()
 {
 	float Angle = 0.f;
 	float DotProduct = UKismetMathLibrary::DotProduct2D(MovementVector, FVector2D(1.f, 0.f));
-	
+
 	if (MovementVector.Y > 0)
 	{
 		Angle = UKismetMathLibrary::DegAcos(DotProduct);
 
-		if(MovementVector.X < 0)
+		if (MovementVector.X < 0)
 		{
 			Angle += 180.f;
 		}
@@ -130,7 +128,7 @@ float ACHeroCharacter::GetMovementAngle()
 	{
 		Angle = 360 - UKismetMathLibrary::DegAcos(DotProduct);
 
-		if(MovementVector.X > 0)
+		if (MovementVector.X > 0)
 		{
 			Angle += 180.f;
 		}
@@ -153,8 +151,9 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		                                   &ACHeroCharacter::CastSecondSkill);
 		EnhancedInputComponent->BindAction(UltimateSkillAction, ETriggerEvent::Triggered, this,
 		                                   &ACHeroCharacter::CastUltimateSkill);
-		// EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
-		EnhancedInputComponent->BindAction(SecondaryAttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::SecondaryAttack);
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
+		EnhancedInputComponent->BindAction(SecondaryAttackAction, ETriggerEvent::Triggered, this,
+		                                   &ACHeroCharacter::SecondaryAttack);
 	}
 	else
 	{
@@ -175,7 +174,7 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 		return;
 	}
 
-	
+
 	if (Controller != nullptr)
 	{
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -191,18 +190,18 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 void ACHeroCharacter::Dash()
 {
-	SetActorRotation(FRotator(0.f,GetMovementAngle(),0.f), ETeleportType::None);
+	SetActorRotation(FRotator(0.f, GetMovementAngle(), 0.f), ETeleportType::None);
 	IsDashing = true;
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::ResetDash,
 	                                AnimationComponent->GetDashTime() - 0.05f, false);
-	AnimationComponent->Dash(this, FVector(MovementVector.Y, MovementVector.X, 0.f).GetSafeNormal() * 500.f);
+	AnimationComponent->Dash(this, FVector(MovementVector.Y, MovementVector.X, 0.f).GetSafeNormal() * 300.f);
 }
 
 void ACHeroCharacter::ResetDash()
 {
 	IsDashing = false;
-	DRAW_TEXT_ONSCREEN(TEXT("Reset"));
+	IsAttacking = false;
 }
 
 void ACHeroCharacter::Equip()
@@ -219,46 +218,62 @@ void ACHeroCharacter::Equip()
 	}
 }
 
+
 void ACHeroCharacter::Attack()
 {
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
-	if (AnimInstance && AttackMontage)
+	IsAttacking = true;
+	if (AttackHandle.IsValid())
 	{
-		if (AnimInstance->Montage_IsPlaying(AttackMontage))
-		{
-			AttackState = 1;
-			return;
-		}
-		AnimInstance->Montage_Play(AttackMontage);
-		FName SectionName = FName();
-
-		switch (AttackState)
-		{
-		case 1:
-			SectionName = "SwordSlash1";
-			AttackState = 1;
-			break;
-		// case 2:
-		// 	SectionName = "SwordSlash2";
-		// 	AttackState = 1;
-		// 	break;
-		// case 3:
-		// 	SectionName = "SwordSlash3";
-		// 	AttackState = 1;
-		// 	break;
-		default:
-			SectionName = "SwordSlash1";
-			AttackState = 1;
-			break;
-		}
-		AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
+		GetWorldTimerManager().ClearTimer(AttackHandle);
 	}
+	GetWorldTimerManager().SetTimer(AttackHandle, this, &ACHeroCharacter::ResetAttack,
+	                                0.5f, false);
+	//AnimInstance = GetMesh()->GetAnimInstance();
+
+	// if (AnimInstance && AttackMontage)
+	// {
+	// 	if (AnimInstance->Montage_IsPlaying(AttackMontage))
+	// 	{
+	// 		AttackState = 1;
+	// 		return;
+	// 	}
+	// 	AnimInstance->Montage_Play(AttackMontage);
+	// 	FName SectionName = FName();
+	//
+	// 	switch (AttackState)
+	// 	{
+	// 	case 1:
+	// 		SectionName = "SwordSlash1";
+	// 		AttackState = 1;
+	// 		break;
+	// 	// case 2:
+	// 	// 	SectionName = "SwordSlash2";
+	// 	// 	AttackState = 1;
+	// 	// 	break;
+	// 	// case 3:
+	// 	// 	SectionName = "SwordSlash3";
+	// 	// 	AttackState = 1;
+	// 	// 	break;
+	// 	default:
+	// 		SectionName = "SwordSlash1";
+	// 		AttackState = 1;
+	// 		break;
+	// 	}
+	// 	AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
+	// }
 }
+
+void ACHeroCharacter::ResetAttack()
+{
+	IsAttacking = false;
+	DRAW_TEXT_ONSCREEN(TEXT("ResetAttack"));
+}
+
 
 void ACHeroCharacter::SaveCharacterStatus()
 {
-	if (USaveSystem* SaveGameInstance = Cast<USaveSystem>(UGameplayStatics::CreateSaveGameObject(USaveSystem::StaticClass())))
+	if (USaveSystem* SaveGameInstance = Cast<USaveSystem>(
+		UGameplayStatics::CreateSaveGameObject(USaveSystem::StaticClass())))
 	{
 		// Set up the (optional) delegate.
 		FAsyncSaveGameToSlotDelegate SavedDelegate;
@@ -344,12 +359,13 @@ void ACHeroCharacter::CheckAttack()
 {
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-	bool IsAnimPlaying = AnimInstance && (AnimInstance->Montage_IsPlaying(AttackMontage) || AnimInstance->Montage_IsPlaying(SpecialAttackMontage));
+	bool IsAnimPlaying = AnimInstance && (AnimInstance->Montage_IsPlaying(AttackMontage) || AnimInstance->
+		Montage_IsPlaying(SpecialAttackMontage));
 	if (AnimInstance && AnimInstance->Montage_IsPlaying(AttackMontage))
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 0.f;
 	}
-	else if(!AnimInstance->Montage_IsPlaying(AttackMontage))
+	else if (!AnimInstance->Montage_IsPlaying(AttackMontage))
 	{
 		GetCharacterMovement()->MaxWalkSpeed = 800.f;
 	}
