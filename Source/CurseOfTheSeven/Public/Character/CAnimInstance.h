@@ -35,6 +35,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool IsDashing;
+
+	UPROPERTY(BlueprintReadOnly, Category = Movement)
+	bool IsDashAttacking;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Movement | Character State")
 	ECharacterState CharacterState;
