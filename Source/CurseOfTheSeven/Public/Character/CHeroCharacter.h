@@ -161,6 +161,7 @@ private:
 	UPROPERTY()
 	FVector2D MovementVector;
 	
+	
 	void ShakeCamera();
 	float GetMovementAngle();
 };
