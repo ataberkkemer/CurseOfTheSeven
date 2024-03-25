@@ -113,26 +113,14 @@ void ACHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 float ACHeroCharacter::GetMovementAngle()
 {
 	float Angle = 0.f;
-	float DotProduct = UKismetMathLibrary::DotProduct2D(MovementVector, FVector2D(1.f, 0.f));
+	float DotProduct = UKismetMathLibrary::DotProduct2D(MovementVector, FVector2D(0.f, 1.f));
 
-	if (MovementVector.Y > 0)
-	{
 		Angle = UKismetMathLibrary::DegAcos(DotProduct);
-
-		if (MovementVector.X < 0)
-		{
-			Angle += 180.f;
-		}
-	}
-	else
+	if (MovementVector.X < 0)
 	{
-		Angle = 360 - UKismetMathLibrary::DegAcos(DotProduct);
-
-		if (MovementVector.X > 0)
-		{
-			Angle += 180.f;
-		}
+		Angle *= -1;
 	}
+	
 	DRAW_TEXT_ONSCREEN(FString::Printf(TEXT("%f"), Angle));
 	return Angle;
 }
@@ -167,6 +155,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
 	MovementVector = Value.Get<FVector2D>().GetRotated(-45.f);
+	float angle = GetMovementAngle();
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
 	if (IsDashing)
