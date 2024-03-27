@@ -154,8 +154,9 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
-	MovementVector = Value.Get<FVector2D>().GetRotated(-45.f);
-	float angle = GetMovementAngle();
+	MovementVector = Value.Get<FVector2D>().GetRotated(-45.f).GetSafeNormal();
+	DRAW_TEXT_ONSCREEN(MovementVector.ToString());
+	// float angle = GetMovementAngle();
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
 	if (IsDashing)
