@@ -155,7 +155,7 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
 	MovementVector = Value.Get<FVector2D>().GetRotated(-45.f).GetSafeNormal();
-	DRAW_TEXT_ONSCREEN(MovementVector.ToString());
+	// DRAW_TEXT_ONSCREEN(MovementVector.ToString());
 	// float angle = GetMovementAngle();
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
@@ -209,6 +209,7 @@ void ACHeroCharacter::Equip()
 }
 
 
+
 void ACHeroCharacter::Attack()
 {
 	IsAttacking = true;
@@ -218,14 +219,28 @@ void ACHeroCharacter::Attack()
 	}
 	GetWorldTimerManager().SetTimer(AttackHandle, this, &ACHeroCharacter::ResetAttack,
 	                                0.5f, false);
-	//AnimInstance = GetMesh()->GetAnimInstance();
-
+	//
+	//
+	//
+	// UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	//
 	// if (AnimInstance && AttackMontage)
 	// {
-	// 	if (AnimInstance->Montage_IsPlaying(AttackMontage))
+	// 	//AnimInstance->Sectio
+	// 	// return;
+	// 	if (!AnimInstance->Montage_IsPlaying(AttackMontage))
 	// 	{
 	// 		AttackState = 1;
-	// 		return;
+	// 	}
+	// 	else
+	// 	{
+	// 		// AnimInstance->StopSlotAnimation(0.35f);
+	// 		AttackState++;
+	//
+	// 		if(AttackState > 3)
+	// 		{
+	// 			AttackState = 1;
+	// 		}
 	// 	}
 	// 	AnimInstance->Montage_Play(AttackMontage);
 	// 	FName SectionName = FName();
@@ -234,29 +249,35 @@ void ACHeroCharacter::Attack()
 	// 	{
 	// 	case 1:
 	// 		SectionName = "SwordSlash1";
-	// 		AttackState = 1;
 	// 		break;
-	// 	// case 2:
-	// 	// 	SectionName = "SwordSlash2";
-	// 	// 	AttackState = 1;
-	// 	// 	break;
-	// 	// case 3:
-	// 	// 	SectionName = "SwordSlash3";
-	// 	// 	AttackState = 1;
-	// 	// 	break;
+	// 	case 2:
+	// 		SectionName = "SwordSlash2";
+	// 		break;
+	// 	case 3:
+	// 		SectionName = "SwordSlash3";
+	// 		break;
 	// 	default:
 	// 		SectionName = "SwordSlash1";
-	// 		AttackState = 1;
 	// 		break;
 	// 	}
 	// 	AnimInstance->Montage_JumpToSection(SectionName, AttackMontage);
 	// }
 }
 
+void ACHeroCharacter::CameraMovementAnimation()
+{
+	AnimationComponent->CameraMovementAnimation(FollowCamera);
+}
+
+void ACHeroCharacter::CameraPostProcessAnimation()
+{
+	AnimationComponent->CameraPostProcessAnimation(FollowCamera);
+}
+
 void ACHeroCharacter::ResetAttack()
 {
 	IsAttacking = false;
-	DRAW_TEXT_ONSCREEN(TEXT("ResetAttack"));
+	// DRAW_TEXT_ONSCREEN(TEXT("ResetAttack"));
 }
 
 

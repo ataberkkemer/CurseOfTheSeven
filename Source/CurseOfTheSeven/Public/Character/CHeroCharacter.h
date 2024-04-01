@@ -46,6 +46,12 @@ public:
 
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 
+	UFUNCTION(BlueprintCallable)
+	void CameraMovementAnimation();
+
+	UFUNCTION(BlueprintCallable)
+	void CameraPostProcessAnimation();
+
 protected:
 	void Move(const FInputActionValue& Value);
 	void Dash();
@@ -54,6 +60,7 @@ protected:
 	UFUNCTION()
 	void Equip();
 	virtual void Attack() override;
+
 	void ResetAttack();
 	// virtual void PlayAttackMontage() override;
 	// virtual void AttackEnd() override;
@@ -89,10 +96,13 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool IsAttacking;
+	
 	FTimerHandle AttackHandle;
+	UPROPERTY(VisibleAnywhere)
+	int32 AttackState = 1;
+
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
-	int32 AttackState = 1;
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
