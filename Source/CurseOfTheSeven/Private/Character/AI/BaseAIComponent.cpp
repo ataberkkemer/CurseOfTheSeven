@@ -5,6 +5,7 @@
 #include "AIController.h"
 #include "AITypes.h"
 #include "Character/Enemy/BaseEnemy.h"
+#include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Navigation/PathFollowingComponent.h"
@@ -29,7 +30,7 @@ void UBaseAIComponent::InitializeAI()
 	BaseEnemy = Cast<ABaseEnemy>(GetOwner());
 	EnemyController = Cast<AAIController>(BaseEnemy->GetCharacterController());
 	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-
+	DRAW_TEXT_ONSCREEN(BaseEnemy->GetName());
 	PlayerInitiate();
 }
 

@@ -38,7 +38,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Navigation")
 	double AttackRadius;
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	ACharacter* Player;
 
 	void MoveToTarget(AActor* Target);

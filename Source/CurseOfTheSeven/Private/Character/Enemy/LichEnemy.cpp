@@ -30,7 +30,14 @@ void ALichEnemy::Attack()
 
 void ALichEnemy::SpawnSkeleton()
 {
-	ASkeletonEnemy* SpawnedSkeleton = GetWorld()->SpawnActor<ASkeletonEnemy>(SkeletonPrefab, SpawnPoint->GetComponentLocation() + FVector(0.f, 0.f, 200.f), GetActorRotation());
+	UWorld* World = GetWorld();
+
+	if(!World)
+	{
+		DRAW_TEXT_ONSCREEN(TEXT("No World"));
+		return;
+	}
+	ASkeletonEnemy* SpawnedSkeleton = World->SpawnActor<ASkeletonEnemy>(SkeletonPrefab, SpawnPoint->GetComponentLocation() + FVector(0.f, 0.f, 200.f), GetActorRotation());
 	SpawnedSkeleton->SpawnAnimation();
 }
 
