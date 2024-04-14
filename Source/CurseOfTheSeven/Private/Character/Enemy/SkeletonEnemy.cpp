@@ -5,6 +5,17 @@
 
 #include "Character/AI/BaseAIComponent.h"
 
+ASkeletonEnemy::ASkeletonEnemy()
+{
+	BaseAI = CreateDefaultSubobject<UBaseAIComponent>(TEXT("AIComponent"));
+}
+
+void ASkeletonEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	BaseAI->InitializeAI();
+}
+
 void ASkeletonEnemy::Attack()
 {
 	Super::Attack();

@@ -16,18 +16,26 @@ UBaseAIComponent::UBaseAIComponent()
 }
 
 
-void UBaseAIComponent::BeginPlay()
+void UBaseAIComponent::PlayerInitiate()
 {
-	Super::BeginPlay();
-
-	BaseEnemy = Cast<ABaseEnemy>(GetOwner());
-	EnemyController = Cast<AAIController>(BaseEnemy->GetCharacterController());
-	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-
 	if (Player)
 	{
 		MoveToTarget(Player);
 	}
+}
+
+void UBaseAIComponent::InitializeAI()
+{
+	BaseEnemy = Cast<ABaseEnemy>(GetOwner());
+	EnemyController = Cast<AAIController>(BaseEnemy->GetCharacterController());
+	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+
+	PlayerInitiate();
+}
+
+void UBaseAIComponent::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 

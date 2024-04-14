@@ -23,6 +23,9 @@ public:
 	void TimeLineProgress(float Value);
 
 	UFUNCTION()
+	void SpawnTimeLineProgress(float Value);
+
+	UFUNCTION()
 	void CameraTimeLineProgress(FVector Value);
 
 	UFUNCTION()
@@ -39,6 +42,7 @@ public:
 
 	UFUNCTION()
 	void CameraPostProcessAnimation(UCameraComponent* CameraActor);
+	void EnemySpawnAnimation(ACharacter* Actor);
 
 	UFUNCTION()
 	float GetDashTime();
@@ -49,6 +53,8 @@ protected:
 	FTimeline CurveFloatTimeline;
 	FTimeline CurveCameraTimeline;
 	FTimeline CurveCameraPostProcessTimeline;
+	FTimeline SpawnTimeline;
+	
 
 	UPROPERTY(EditAnywhere, Category = "Timeline")
 	UCurveFloat* CurveFloat;
@@ -61,7 +67,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Timeline")
 	UCurveVector* PostProcessCurve;
-
+	
+	
+	UPROPERTY(EditAnywhere, Category = "Timeline")
+	UCurveFloat* SpawnCurveFloat;
+	
 	UPROPERTY()
 	FVector StartPosition;
 

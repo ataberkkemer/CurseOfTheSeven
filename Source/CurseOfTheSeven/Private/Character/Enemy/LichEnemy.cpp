@@ -3,6 +3,37 @@
 
 #include "Character/Enemy/LichEnemy.h"
 
+#include "Character/AI/LichAIComponent.h"
+#include "CurseOfTheSeven/DebugMacros.h"
+
+
+ALichEnemy::ALichEnemy()
+{
+	SpawnPoint = CreateDefaultSubobject<USceneComponent>("SpawnPoint");
+	SpawnPoint->SetupAttachment(GetRootComponent());
+
+	BaseAI = CreateDefaultSubobject<ULichAIComponent>(TEXT("AIComponent"));
+
+}
+
+void ALichEnemy::BeginPlay()
+{
+	Super::BeginPlay();
+	BaseAI->InitializeAI();
+	SpawnSkeleton();
+}
+
+void ALichEnemy::Attack()
+{
+	Super::Attack();
+}
+
+void ALichEnemy::SpawnSkeleton()
+{
+	ASkeletonEnemy* SpawnedSkeleton = GetWorld()->SpawnActor<ASkeletonEnemy>(SkeletonPrefab, SpawnPoint->GetComponentLocation() + FVector(0.f, 0.f, 200.f), GetActorRotation());
+	SpawnedSkeleton->SpawnAnimation();
+}
+
 void ALichEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
 	Super::DirectionalHitReact(ImpactPoint);

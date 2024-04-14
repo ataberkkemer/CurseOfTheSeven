@@ -9,12 +9,14 @@
 #include "GameFramework/Character.h"
 #include "BaseEnemy.generated.h"
 
+class USkillSlotComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 class UAnimMontage;
 class UAttributeComponent;
 class UHealthBarComponent;
 class UBaseAIComponent;
+class UAnimationComponent;
 
 UCLASS()
 class CURSEOFTHESEVEN_API ABaseEnemy : public ABaseCharacter
@@ -36,6 +38,7 @@ public:
 
 	virtual void Attack() override;
 	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;
+	virtual void SpawnAnimation();
 	bool IsAttackPlaying();
 	
 protected:
@@ -52,6 +55,9 @@ protected:
 	
 	UFUNCTION(BlueprintImplementableEvent, Category = "Damage")
 	void OnDamageTaken(int Damage);
+
+	UPROPERTY(VisibleAnywhere)
+	USkillSlotComponent* SkillSlotComponent;
 	
 private:
 	
@@ -60,7 +66,10 @@ private:
 	
 	UPROPERTY(EditAnywhere)
 	UUserWidget* DamageWidget;
-
+	
+	UPROPERTY(EditAnywhere)
+	UAnimationComponent* AnimationComponent;
+	
 	UPROPERTY()
 	AActor* CombatTarget;
 

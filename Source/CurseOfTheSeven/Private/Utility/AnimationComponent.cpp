@@ -36,6 +36,13 @@ void UAnimationComponent::TimeLineProgress(float Value)
 	AnimatedActor->SetActorLocation(NewLocation, true, HitResult, ETeleportType::None);
 }
 
+void UAnimationComponent::SpawnTimeLineProgress(float Value)
+{
+	FVector NewLocation = FVector(AnimatedActor->GetActorLocation().X, AnimatedActor->GetActorLocation().Y, Value);
+	FHitResult* HitResult = nullptr;
+	AnimatedActor->SetActorLocation(NewLocation, true, HitResult, ETeleportType::None);
+}
+
 void UAnimationComponent::CameraTimeLineProgress(FVector Value)
 {
 	DRAW_TEXT_ONSCREEN(Value.ToString());
@@ -120,6 +127,25 @@ void UAnimationComponent::CameraPostProcessAnimation(UCameraComponent* CameraAct
 		CurveCameraPostProcessTimeline.SetLooping(false);
 		CurveCameraPostProcessTimeline.PlayFromStart();
 		
+	}
+}
+
+void UAnimationComponent::EnemySpawnAnimation(ACharacter* Actor)
+{
+	if (SpawnCurveFloat && !SpawnTimeline.IsPlaying())
+	{
+		AnimatedActor = Actor;
+		FOnTimelineVector TimeLineProgress;
+		TimeLineProgress.BindUFunction(this, FName("SpawnTimeLineProgress"));
+		SpawnTimeline.AddInterpVector(CameraCurvePosition, TimeLineProgress);
+		SpawnTimeline.SetLooping(false);
+		CurveCameraTimeline.PlayFromStart();
+
+		
+		// FTimerHandle UnusedHandle;
+		// AnimatedActor->GetWorldTimerManager().SetTimer(UnusedHandle,this, &UAnimationComponent::DashCallback, 1.f);
+
+		// GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("Time %f"),));
 	}
 }
 
