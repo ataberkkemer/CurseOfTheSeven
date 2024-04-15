@@ -20,7 +20,9 @@ public:
 	void SetStagger();
 	void ResetStagger();
 	void InitializeAI();
-
+	
+	UPROPERTY(EditAnywhere, Category = "Navigation")
+	double AttackRadius;
 protected:
 	virtual void BeginPlay() override;
 	virtual void PlayerInitiate();
@@ -35,9 +37,6 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "Navigation")
 	TArray<AActor*> AllPatrolTargets;
 
-	UPROPERTY(EditAnywhere, Category = "Navigation")
-	double AttackRadius;
-	
 	UPROPERTY(VisibleAnywhere)
 	ACharacter* Player;
 

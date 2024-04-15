@@ -4,6 +4,7 @@
 #include "Character/Enemy/SkeletonEnemy.h"
 
 #include "Character/AI/BaseAIComponent.h"
+#include "CurseOfTheSeven/DebugMacros.h"
 
 ASkeletonEnemy::ASkeletonEnemy()
 {
@@ -32,7 +33,6 @@ void ASkeletonEnemy::PlayAttackMontage()
 	Super::PlayAttackMontage();
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-
 	if (AnimInstance && AttackMontage)
 	{
 		if (AnimInstance->Montage_IsPlaying(AttackMontage))

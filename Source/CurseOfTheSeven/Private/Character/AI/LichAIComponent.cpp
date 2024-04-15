@@ -13,8 +13,3 @@ void ULichAIComponent::PlayerInitiate()
 {
 	// LichEnemy->SpawnSkeleton();
 }
-
-void ULichAIComponent::CheckPlayer()
-{
-	
-}

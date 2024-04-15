@@ -19,7 +19,6 @@ public:
 	virtual void BeginPlay() override;
 protected:
 	virtual void PlayerInitiate() override;
-	virtual void CheckPlayer() override;
 	
 private:
 	ALichEnemy* LichEnemy = nullptr;
