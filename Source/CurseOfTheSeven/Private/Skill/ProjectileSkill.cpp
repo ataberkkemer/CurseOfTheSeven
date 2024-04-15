@@ -29,3 +29,5 @@ void AProjectileSkill::BeginPlay()
 	Super::BeginPlay();
 	
 }
+
+
