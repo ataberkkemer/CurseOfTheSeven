@@ -4,6 +4,7 @@
 #include "Skill/BaseSkill.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Character/CHeroCharacter.h"
 #include "Components/SphereComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -50,6 +51,11 @@ void ABaseSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	if (OtherActor != nullptr && OtherActor != GetOwner())
 	{
+		ACHeroCharacter* HeroCharacter = Cast<ACHeroCharacter>(OtherActor);
+		// if(!HeroCharacter)
+		// {
+		// 	return;
+		// }
 		DRAW_TEXT_ONSCREEN(SweepResult.ImpactPoint.ToString());
 		SetLifeSpan(3.f);
 		if (HitEffect && GetWorld())
@@ -59,7 +65,7 @@ void ABaseSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 				GetWorld(), HitEffect, SweepResult.ImpactPoint);
 
 			HitParticleInstance->Activate();
-
+			DRAW_TEXT_ONSCREEN(HitParticleInstance->GetName());
 			if (HitSound)
 			{
 				UGameplayStatics::PlaySoundAtLocation(
