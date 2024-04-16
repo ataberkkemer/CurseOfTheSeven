@@ -7,6 +7,7 @@
 #include "Character/Components/AttributeComponent.h"
 #include "Character/SkillComponent/SkillSlotComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 ALichEnemy::ALichEnemy()
@@ -30,6 +31,7 @@ void ALichEnemy::BeginPlay()
 void ALichEnemy::Attack()
 {
 	Super::Attack();
+	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), BaseAI->GetPlayerLocation()));
 	PlayAttackMontage();
 }
 
@@ -165,7 +167,7 @@ bool ALichEnemy::CheckSkills()
 
 bool ALichEnemy::CheckSpawn()
 {
-	if(SpawnTimer >= 10.f)
+	if(SpawnTimer >= 30.f)
 	{
 		SpawnSkeleton();
 		SpawnTimer = 0.f;

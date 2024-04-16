@@ -20,7 +20,8 @@ public:
 	void SetStagger();
 	void ResetStagger();
 	void InitializeAI();
-	
+	FVector GetPlayerLocation() const;;
+
 	UPROPERTY(EditAnywhere, Category = "Navigation")
 	double AttackRadius;
 protected:
