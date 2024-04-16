@@ -121,10 +121,9 @@ void ACHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 	if(StaggerHandle.IsValid())
 	{
 		StaggerHandle.Invalidate();
-		return;
 	}
 	GetWorldTimerManager().SetTimer(StaggerHandle, this, &ACHeroCharacter::ResetStagger,
-									2.f, false);
+									.8f, false);
 	GetCharacterMovement()->MaxWalkSpeed = 0.f;
 	IsStagger = true;
 
@@ -338,6 +337,8 @@ void ACHeroCharacter::SaveDelegate(const FString& SlotName, int UserIndex, bool 
 
 void ACHeroCharacter::CastFirstSkill()
 {
+	if(IsStagger) return;
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance->Montage_IsPlaying(FirstSkillSlotComponent->GetSkillMontage()))
 	{
