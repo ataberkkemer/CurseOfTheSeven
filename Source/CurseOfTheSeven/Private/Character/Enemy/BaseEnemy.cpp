@@ -7,6 +7,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Character/AI/BaseAIComponent.h"
 #include "Character/Components/AttributeComponent.h"
+#include "Character/SkillComponent/SkillSlotComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
@@ -14,6 +15,7 @@
 #include "HUD/HealthBarComponent.h"
 #include "Item/Weapon.h"
 #include "Kismet/GameplayStatics.h"
+#include "Utility/AnimationComponent.h"
 
 // Sets default values
 ABaseEnemy::ABaseEnemy()
@@ -29,8 +31,9 @@ ABaseEnemy::ABaseEnemy()
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	// FloatingDamageWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("FloatingDamage"));
-	BaseAI = CreateDefaultSubobject<UBaseAIComponent>(TEXT("AIComponent"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
+	SkillSlotComponent = CreateDefaultSubobject<USkillSlotComponent>(TEXT("SkillSlot"));
+	AnimationComponent = CreateDefaultSubobject<UAnimationComponent>(TEXT("AnimationComponent"));
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
@@ -132,6 +135,11 @@ void ABaseEnemy::Attack()
 void ABaseEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
 	Super::DirectionalHitReact(ImpactPoint);
+}
+
+void ABaseEnemy::SpawnAnimation()
+{
+	AnimationComponent->EnemySpawnAnimation(this);
 }
 
 bool ABaseEnemy::IsAttackPlaying()

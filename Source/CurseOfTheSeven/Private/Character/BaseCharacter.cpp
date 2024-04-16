@@ -123,10 +123,6 @@ void ABaseCharacter::SpawnDefaultWeapon()
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
 		DefaultWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this);
 		EquippedWeapon = DefaultWeapon;
-				
-		
-		DRAW_TEXT_ONSCREEN(GetOwner()->GetName());
-
 	}
 }
 

@@ -15,6 +15,8 @@ class CURSEOFTHESEVEN_API ASkeletonEnemy : public ABaseEnemy
 	GENERATED_BODY()
 
 public:
+	ASkeletonEnemy();
+	virtual void BeginPlay() override;
 	virtual void Attack() override;
 	virtual void Die() override;
 	

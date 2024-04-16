@@ -19,9 +19,14 @@ public:
 	
 	void SetStagger();
 	void ResetStagger();
-
+	void InitializeAI();
+	
+	UPROPERTY(EditAnywhere, Category = "Navigation")
+	double AttackRadius;
 protected:
 	virtual void BeginPlay() override;
+	virtual void PlayerInitiate();
+	virtual void CheckPlayer();
 
 	UPROPERTY()
 	class AAIController* EnemyController;
@@ -32,18 +37,15 @@ protected:
 	UPROPERTY(EditInstanceOnly, Category = "Navigation")
 	TArray<AActor*> AllPatrolTargets;
 
-	UPROPERTY(EditAnywhere, Category = "Navigation")
-	double AttackRadius;
-	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	ACharacter* Player;
 
 	void MoveToTarget(AActor* Target);
 	AActor* ChoosePatrolTarget();
 
+	ABaseEnemy* BaseEnemy = nullptr;
 private:	
 	UPROPERTY(VisibleAnywhere, Category = "Variables")
-	ABaseEnemy* BaseEnemy;
 
 	FTimerHandle PatrolTimer;
 	FTimerHandle StaggerTimer;
@@ -56,8 +58,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "AI Navigation")
 	float WaitMax = 10.f;
 	
+
 	EEnemyState EnemyState = EEnemyState::EES_Chasing;
 	
 	void CheckPatrolTarget();
-	void CheckPlayer();
 };
