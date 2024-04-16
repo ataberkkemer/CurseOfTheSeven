@@ -20,6 +20,7 @@ void ASkeletonEnemy::BeginPlay()
 void ASkeletonEnemy::Attack()
 {
 	Super::Attack();
+	return;
 	PlayAttackMontage();
 }
 
