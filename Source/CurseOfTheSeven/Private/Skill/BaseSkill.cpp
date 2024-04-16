@@ -52,10 +52,11 @@ void ABaseSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	if (OtherActor != nullptr && OtherActor != GetOwner())
 	{
 		ACHeroCharacter* HeroCharacter = Cast<ACHeroCharacter>(OtherActor);
-		// if(!HeroCharacter)
-		// {
-		// 	return;
-		// }
+		if(HeroCharacter)
+		{
+			return;
+		}
+		DRAW_TEXT_ONSCREEN(OtherActor->GetName());
 		DRAW_TEXT_ONSCREEN(SweepResult.ImpactPoint.ToString());
 		SetLifeSpan(3.f);
 		if (HitEffect && GetWorld())

@@ -34,6 +34,15 @@ void UBaseAIComponent::InitializeAI()
 	PlayerInitiate();
 }
 
+FVector UBaseAIComponent::GetPlayerLocation() const
+{
+	if(Player)
+	{
+		return Player->GetActorLocation();
+	}
+	return FVector::ForwardVector;
+}
+
 void UBaseAIComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -103,7 +112,7 @@ void UBaseAIComponent::CheckPlayer()
 	{
 		return;
 	}
-
+	
 	if (!BaseEnemy->InTargetRange(Player, AttackRadius))
 	{
 		MoveToTarget(Player);

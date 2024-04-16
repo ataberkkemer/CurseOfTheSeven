@@ -44,6 +44,7 @@ public:
 	FORCEINLINE void SetOverlapingItem(AItem* Item) { OverlappingItem = Item; }
 	FORCEINLINE void SetCharacterState(AItem* Item) { OverlappingItem = Item; }
 
+	void ResetStagger();
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 
 	UFUNCTION(BlueprintCallable)
@@ -100,6 +101,11 @@ protected:
 	FTimerHandle AttackHandle;
 	UPROPERTY(VisibleAnywhere)
 	int32 AttackState = 1;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsStagger = false;
+	FTimerHandle StaggerHandle;
+	float Timer;
 
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_UnEquipped;
@@ -174,4 +180,5 @@ private:
 	
 	void ShakeCamera();
 	float GetMovementAngle();
+
 };
