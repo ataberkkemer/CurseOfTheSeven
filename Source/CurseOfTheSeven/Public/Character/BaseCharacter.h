@@ -60,8 +60,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	AWeapon* EquippedWeapon;
 
-	// UPROPERTY(BlueprintReadOnly)
-	// TEnumAsByte<EDeathPose> DeathPose;
+	UPROPERTY(BlueprintReadOnly)
+	EDeathPose DeathPose;
 	
 	UNiagaraComponent* HitParticleInstance;
 

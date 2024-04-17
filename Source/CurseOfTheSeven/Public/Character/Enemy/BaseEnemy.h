@@ -58,11 +58,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	USkillSlotComponent* SkillSlotComponent;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UHealthBarComponent* HealthBarWidget;
 private:
 	
-	UPROPERTY(VisibleAnywhere)
-	UHealthBarComponent* HealthBarWidget;
 	
 	UPROPERTY(EditAnywhere)
 	UUserWidget* DamageWidget;

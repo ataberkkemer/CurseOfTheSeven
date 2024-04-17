@@ -147,7 +147,7 @@ void ABaseSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 		{
 			if (ActorIsSameType(SphereHit.GetActor())) return;
 
-			UGameplayStatics::ApplyDamage(SphereHit.GetActor(), 50, GetInstigator()->GetController(), this,
+			UGameplayStatics::ApplyDamage(SphereHit.GetActor(), Attributes->GetRawDamage(), GetInstigator()->GetController(), this,
 							  UDamageType::StaticClass());
 			ExecuteGetHit(SphereHit);
 
