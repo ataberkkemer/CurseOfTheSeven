@@ -65,7 +65,7 @@ void ABaseEnemy::Tick(float DeltaTime)
 		if (!InTargetRange(CombatTarget, CombatRadius))
 		{
 			CombatTarget = nullptr;
-			SetHealthBarVisibility(false);		
+			SetHealthBarVisibility(true);		
 		}
 	}
 }
@@ -127,7 +127,8 @@ AController* ABaseEnemy::GetCharacterController()
 	return GetController();
 }
 
-void ABaseEnemy::Attack()
+void ABaseEnemy::
+Attack()
 {
 	Super::Attack();
 }

@@ -217,12 +217,15 @@ void ACHeroCharacter::Dash()
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::ResetDash,
 	                                AnimationComponent->GetDashTime() - 0.05f, false);
 	AnimationComponent->Dash(this, FVector(MovementVector.Y, MovementVector.X, 0.f).GetSafeNormal() * 300.f);
+	EquippedWeapon->SetActorHiddenInGame(true);
 }
 
 void ACHeroCharacter::ResetDash()
 {
 	IsDashing = false;
 	IsAttacking = false;
+	EquippedWeapon->SetActorHiddenInGame(false);
+
 }
 
 void ACHeroCharacter::Equip()
