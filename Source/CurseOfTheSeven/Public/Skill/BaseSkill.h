@@ -22,14 +22,23 @@ public:
 	ABaseSkill();
 
 	virtual void BeginPlay() override;
+	void Equip(AActor* NewOwner, APawn* NewInstigator);
 
 	void SetAttributes(float RawDamage, float ElementalDamage, float DamageTickInterval, float StaggerDamage);
-	
+	void SphereTrace(FHitResult& SphereHit);
+	void DisableActor(bool toHide);
+	void ApplyDamage(FHitResult SphereHit);
+	void ExecuteMultipleHitTry(FHitResult HitResult);
+	TArray<AActor*> IgnoreActors;
+
 	UPROPERTY(EditDefaultsOnly)
 	float Delay;
 	
 	UPROPERTY(VisibleDefaultsOnly)
 	UNiagaraComponent* SkillEffect;
+	
+	UPROPERTY(EditAnywhere)
+	bool IsMultipleHitSkill;
 
 	UPROPERTY(EditAnywhere, Category = "Active Effects")
 	USoundBase* ActiveSound;
@@ -46,6 +55,12 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USkillAttribiuteComponent* Attributes;
 	
+	UPROPERTY(VisibleAnywhere)
+    	USceneComponent* SphereTraceStart;
+    	
+    	UPROPERTY(VisibleAnywhere)
+    	USceneComponent* SphereTraceEnd;
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
@@ -53,10 +68,18 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USphereComponent* SphereCollision;
 
+	void ExecuteMultipleHit(FHitResult& SphereHit);
 	UFUNCTION()
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	                             UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
 	                             const FHitResult& SweepResult);
+	UFUNCTION()
+	virtual void OnSphereOverlapEnd();
+
+	bool ActorIsSameType(AActor* OtherActor);
+	void ExecuteGetHit(FHitResult& SphereHit);
+	void RespawnPlayer(APlayerController* PlayerController);
+	void RespawnPlayerWithDelay(FHitResult Player);
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Hit Effects")
@@ -64,7 +87,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float LifeSpan;
-
+	
+	
 
 	int SkillIndex;
 };

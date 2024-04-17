@@ -99,6 +99,11 @@ void ACHeroCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+
+	FirstSkillSlotComponent->Equip(this, this);
+	SecondSkillSlotComponent->Equip(this, this);
+	UltimateSkillSlotComponent->Equip(this, this);
+
 	Tags.Add(FName("EngageableTarget"));
 }
 
@@ -354,7 +359,7 @@ void ACHeroCharacter::CastFirstSkill()
 void ACHeroCharacter::SpawnFirstSkill()
 {
 	if(IsStagger) return;
-	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
+	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
 }
 
 void ACHeroCharacter::CastSecondSkill()
@@ -377,7 +382,7 @@ void ACHeroCharacter::SpawnSecondSkill()
 {
 	if(IsStagger) return;
 
-	SecondSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
+	SecondSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
 }
 
 void ACHeroCharacter::CastUltimateSkill()
@@ -400,7 +405,7 @@ void ACHeroCharacter::SpawnUltimateSkill()
 {
 	if(IsStagger) return;
 
-	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation());
+	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
 }
 
 void ACHeroCharacter::CheckAttack()
