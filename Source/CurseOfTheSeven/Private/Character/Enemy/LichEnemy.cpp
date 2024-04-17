@@ -72,7 +72,7 @@ void ALichEnemy::Die()
 
 void ALichEnemy::SpawnSkill()
 {
-	SkillSlotComponent->SpawnSkill(SkillCastPoint->GetComponentLocation(), GetActorRotation());
+	SkillSlotComponent->SpawnSkill(SkillCastPoint->GetComponentLocation(), GetActorRotation(), this, this);
 }
 
 void ALichEnemy::PlayAttackMontage()

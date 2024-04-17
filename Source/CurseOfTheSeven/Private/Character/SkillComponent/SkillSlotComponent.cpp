@@ -25,11 +25,15 @@ void USkillSlotComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void USkillSlotComponent::SpawnSkill(FVector Position, FRotator Rotation)
+void USkillSlotComponent::SpawnSkill(FVector Position, FRotator Rotation, AActor* NewOwner, APawn* NewInstigator)
 {
 	if (OwnerActor->GetWorld() && SlotSkill)
 	{
 		ABaseSkill* SpawnedSkill = OwnerActor->GetWorld()->SpawnActor<ABaseSkill>(SlotSkill, Position, Rotation);
+		SpawnedSkill->DisableActor(true);
+		SpawnedSkill->Equip(NewOwner,NewInstigator);
+		SpawnedSkill->DisableActor(false);
+
 		if(UpgradedParticle)
 		{
 			SpawnedSkill->SkillEffect->SetAsset(UpgradedParticle);
@@ -52,6 +56,17 @@ void USkillSlotComponent::SetSkill(ABaseSkill* BaseSkill)
 		AttributeData.RawDamage = SlotSkill.GetDefaultObject()->Attributes->GetRawDamage();
 		AttributeData.ElementalDamage = SlotSkill.GetDefaultObject()->Attributes->GetElementalDamage();
 		AttributeData.StaggerDamage = SlotSkill.GetDefaultObject()->Attributes->GetStaggerDamage();
+
+	}
+}
+
+void USkillSlotComponent::Equip(AActor* NewOwner, APawn* NewIns)
+{
+	if(SlotSkill)
+	{
+		SlotSkill.GetDefaultObject()->SetOwner(NewOwner);
+		SlotSkill.GetDefaultObject()->SetInstigator(NewIns);
+
 	}
 }
 
