@@ -103,7 +103,7 @@ void ABaseSkill::DisableActor(bool toHide)
 
 void ABaseSkill::ExecuteMultipleHitTry(FHitResult HitResult)
 {
-	UGameplayStatics::ApplyDamage(HitResult.GetActor(), 50, GetInstigator()->GetController(), this,
+	UGameplayStatics::ApplyDamage(HitResult.GetActor(), Attributes->GetRawDamage(), GetInstigator()->GetController(), this,
 							  UDamageType::StaticClass());
 	ExecuteGetHit(HitResult);
 }

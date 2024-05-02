@@ -135,11 +135,11 @@ void UAnimationComponent::EnemySpawnAnimation(ACharacter* Actor)
 	if (SpawnCurveFloat && !SpawnTimeline.IsPlaying())
 	{
 		AnimatedActor = Actor;
-		FOnTimelineVector TimeLineProgress;
+		FOnTimelineFloat TimeLineProgress;
 		TimeLineProgress.BindUFunction(this, FName("SpawnTimeLineProgress"));
-		SpawnTimeline.AddInterpVector(CameraCurvePosition, TimeLineProgress);
+		SpawnTimeline.AddInterpFloat(SpawnCurveFloat, TimeLineProgress);
 		SpawnTimeline.SetLooping(false);
-		CurveCameraTimeline.PlayFromStart();
+		SpawnTimeline.PlayFromStart();
 
 		
 		// FTimerHandle UnusedHandle;

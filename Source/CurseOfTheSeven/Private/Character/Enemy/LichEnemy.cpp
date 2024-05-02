@@ -25,7 +25,7 @@ void ALichEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	BaseAI->InitializeAI();
-	SpawnSkeleton();
+	//SpawnSkeleton();
 }
 
 void ALichEnemy::Attack()
@@ -53,7 +53,7 @@ void ALichEnemy::SpawnSkeleton()
 	}
 	ASkeletonEnemy* SpawnedSkeleton = World->SpawnActor<ASkeletonEnemy>(SkeletonPrefab, SpawnPoint->GetComponentLocation() + FVector(0.f, 0.f, 200.f), GetActorRotation());
 	SpawnedSkeleton->SpawnAnimation();
-}
+ }
 
 void ALichEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
@@ -79,7 +79,7 @@ void ALichEnemy::PlayAttackMontage()
 {
 	Super::PlayAttackMontage();
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	DRAW_TEXT_ONSCREEN(TEXT("Attack"));
+	//DRAW_TEXT_ONSCREEN(TEXT("Attack"));
 
 	if(Attributes->GetHealthPercent() <= .5f)
 	{
@@ -138,18 +138,18 @@ void ALichEnemy::PlayAttackMontage()
 	{
 		DRAW_TEXT_ONSCREEN(TEXT("Skill Attack"));
 
-		if (AnimInstance && SkillSlotComponent->GetSkillMontage())
-		{
-			if (AnimInstance->Montage_IsPlaying(SkillSlotComponent->GetSkillMontage()))
-			{
-				return;
-			}
-			AnimInstance->Montage_Play(SkillSlotComponent->GetSkillMontage());
-
-			FTimerHandle UnusedHandle;
-			GetWorldTimerManager().SetTimer(UnusedHandle, this, &ALichEnemy::SpawnSkill,
-											SkillSlotComponent->GetDelay(), false);
-		}
+		// if (AnimInstance && SkillSlotComponent->GetSkillMontage())
+		// {
+		// 	if (AnimInstance->Montage_IsPlaying(SkillSlotComponent->GetSkillMontage()))
+		// 	{
+		// 		return;
+		// 	}
+		// 	AnimInstance->Montage_Play(SkillSlotComponent->GetSkillMontage());
+		//
+		// 	FTimerHandle UnusedHandle;
+		// 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ALichEnemy::SpawnSkill,
+		// 									SkillSlotComponent->GetDelay(), false);
+		// }
 	}
 	
 }
@@ -169,6 +169,7 @@ bool ALichEnemy::CheckSpawn()
 {
 	if(SpawnTimer >= 30.f)
 	{
+		DRAW_TEXT_ONSCREEN(TEXT("Skeleton"));
 		SpawnSkeleton();
 		SpawnTimer = 0.f;
 		SkillTimer = 0.f;
