@@ -48,8 +48,12 @@ void ABaseSkill::BeginPlay()
 
 void ABaseSkill::Equip(AActor* NewOwner, APawn* NewInstigator)
 {
-	SetOwner(NewOwner);
-	SetInstigator(NewInstigator);
+	OwnerActor = NewOwner;
+	InstigatorPawn = NewInstigator;
+	
+	SetOwner(OwnerActor);
+	SetInstigator(InstigatorPawn);
+	
 }
 
 void ABaseSkill::SetAttributes(float RawDamage, float ElementalDamage, float DamageTickInterval, float StaggerDamage)
@@ -103,7 +107,7 @@ void ABaseSkill::DisableActor(bool toHide)
 
 void ABaseSkill::ExecuteMultipleHitTry(FHitResult HitResult)
 {
-	UGameplayStatics::ApplyDamage(HitResult.GetActor(), 50, GetInstigator()->GetController(), this,
+	UGameplayStatics::ApplyDamage(HitResult.GetActor(), Attributes->GetRawDamage(), GetInstigator()->GetController(), this,
 							  UDamageType::StaticClass());
 	ExecuteGetHit(HitResult);
 }
@@ -121,6 +125,7 @@ void ABaseSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 {
 	if (OtherActor != nullptr && OtherActor != GetOwner())
 	{
+		DRAW_TEXT_ONSCREEN(OtherActor->GetName());
 		ACHeroCharacter* Hero = Cast<ACHeroCharacter>(OtherActor);
 		if (Hero)
 		{

@@ -43,11 +43,13 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void SpawnSkill();
 	
 	
 	virtual void Die() override;
 
 	void SetHealthBarVisibility(const bool IsVisible) const;
+	void SetEnemyCollision(ECollisionEnabled::Type CollisionType);
 	void SetDead();
 
 	UPROPERTY(VisibleAnywhere)

@@ -28,7 +28,7 @@ public:
 protected:
 	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;
 	virtual void Die() override;
-	void SpawnSkill();
+	void SpawnSkill() override;
 	virtual void PlayAttackMontage() override;
 	bool CheckSkills();
 	bool CheckSpawn();
