@@ -25,7 +25,7 @@ void ALichEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 	BaseAI->InitializeAI();
-	//SpawnSkeleton();
+	SpawnSkeleton();
 }
 
 void ALichEnemy::Attack()
@@ -83,7 +83,6 @@ void ALichEnemy::PlayAttackMontage()
 
 	if(Attributes->GetHealthPercent() <= .5f)
 	{
-		DRAW_TEXT_ONSCREEN(TEXT("Normal Attack"));
 		
 		BaseAI->AttackRadius = 100.f;
 		if (AnimInstance && AttackMontage)
@@ -116,7 +115,6 @@ void ALichEnemy::PlayAttackMontage()
 
 	if(CheckSpawn())
 	{
-		DRAW_TEXT_ONSCREEN(TEXT("Spawn Attack"));
 
 		if (AnimInstance && SpawnMontage)
 		{
@@ -136,20 +134,19 @@ void ALichEnemy::PlayAttackMontage()
 
 	if(CheckSkills())
 	{
-		DRAW_TEXT_ONSCREEN(TEXT("Skill Attack"));
 
-		// if (AnimInstance && SkillSlotComponent->GetSkillMontage())
-		// {
-		// 	if (AnimInstance->Montage_IsPlaying(SkillSlotComponent->GetSkillMontage()))
-		// 	{
-		// 		return;
-		// 	}
-		// 	AnimInstance->Montage_Play(SkillSlotComponent->GetSkillMontage());
-		//
-		// 	FTimerHandle UnusedHandle;
-		// 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ALichEnemy::SpawnSkill,
-		// 									SkillSlotComponent->GetDelay(), false);
-		// }
+		if (AnimInstance && SkillSlotComponent->GetSkillMontage())
+		{
+			if (AnimInstance->Montage_IsPlaying(SkillSlotComponent->GetSkillMontage()))
+			{
+				return;
+			}
+			AnimInstance->Montage_Play(SkillSlotComponent->GetSkillMontage());
+		
+			FTimerHandle UnusedHandle;
+			GetWorldTimerManager().SetTimer(UnusedHandle, this, &ALichEnemy::SpawnSkill,
+											SkillSlotComponent->GetDelay(), false);
+		}
 	}
 	
 }
@@ -169,7 +166,6 @@ bool ALichEnemy::CheckSpawn()
 {
 	if(SpawnTimer >= 30.f)
 	{
-		DRAW_TEXT_ONSCREEN(TEXT("Skeleton"));
 		SpawnSkeleton();
 		SpawnTimer = 0.f;
 		SkillTimer = 0.f;

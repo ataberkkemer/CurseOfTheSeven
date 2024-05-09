@@ -24,4 +24,13 @@ public:
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovementComponent;
+	
+	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
+	float Speed;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
+	float MaxSpeed;
+	
+	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
+	float Gravity;
 };

@@ -55,6 +55,10 @@ void ABaseEnemy::BeginPlay()
 	
 }
 
+void ABaseEnemy::SpawnSkill()
+{
+}
+
 // Called every frame
 void ABaseEnemy::Tick(float DeltaTime)
 {
