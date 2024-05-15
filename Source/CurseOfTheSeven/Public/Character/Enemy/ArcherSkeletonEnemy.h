@@ -23,6 +23,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Damage")
 	void OnAttack();
+
+	UPROPERTY(EditAnywhere)
+	float ArrowCastDelay;
 protected:
 
 	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;

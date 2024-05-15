@@ -55,7 +55,7 @@ void AArcherSkeletonEnemy::PlayAttackMontage()
 
 		FTimerHandle UnusedHandle;
 		GetWorldTimerManager().SetTimer(UnusedHandle, this, &AArcherSkeletonEnemy::SpawnSkill,
-											.40f, false);
+											ArrowCastDelay, false);
 	}
 }
 
