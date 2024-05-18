@@ -160,7 +160,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* SpecialAttackMontage;
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	float DashLimit;
 	/// Components
 	UPROPERTY(VisibleAnywhere)
 	UAnimationComponent* AnimationComponent;

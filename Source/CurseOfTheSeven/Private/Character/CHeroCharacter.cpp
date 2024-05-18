@@ -67,7 +67,7 @@ ACHeroCharacter::ACHeroCharacter()
 void ACHeroCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(IsStagger)
+	if (IsStagger)
 	{
 		Timer += DeltaTime;
 	}
@@ -98,12 +98,12 @@ void ACHeroCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+		PlayerController->SetShowMouseCursor(true);
 	}
 
 	FirstSkillSlotComponent->Equip(this, this);
 	SecondSkillSlotComponent->Equip(this, this);
 	UltimateSkillSlotComponent->Equip(this, this);
-
 	Tags.Add(FName("EngageableTarget"));
 }
 
@@ -123,12 +123,12 @@ void ACHeroCharacter::ResetStagger()
 void ACHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
-	if(StaggerHandle.IsValid())
+	if (StaggerHandle.IsValid())
 	{
 		StaggerHandle.Invalidate();
 	}
 	GetWorldTimerManager().SetTimer(StaggerHandle, this, &ACHeroCharacter::ResetStagger,
-									.8f, false);
+	                                .8f, false);
 	GetCharacterMovement()->MaxWalkSpeed = 0.f;
 	IsStagger = true;
 
@@ -141,12 +141,12 @@ float ACHeroCharacter::GetMovementAngle()
 	float Angle = 0.f;
 	float DotProduct = UKismetMathLibrary::DotProduct2D(MovementVector, FVector2D(0.f, 1.f));
 
-		Angle = UKismetMathLibrary::DegAcos(DotProduct);
+	Angle = UKismetMathLibrary::DegAcos(DotProduct);
 	if (MovementVector.X < 0)
 	{
 		Angle *= -1;
 	}
-	
+
 	DRAW_TEXT_ONSCREEN(FString::Printf(TEXT("%f"), Angle));
 	return Angle;
 }
@@ -180,11 +180,11 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
-	if(IsStagger)
+	if (IsStagger)
 	{
 		return;
 	}
-	
+
 	MovementVector = Value.Get<FVector2D>().GetRotated(-45.f).GetSafeNormal();
 	// DRAW_TEXT_ONSCREEN(MovementVector.ToString());
 	// float angle = GetMovementAngle();
@@ -225,7 +225,6 @@ void ACHeroCharacter::ResetDash()
 	IsDashing = false;
 	IsAttacking = false;
 	EquippedWeapon->SetActorHiddenInGame(false);
-
 }
 
 void ACHeroCharacter::Equip()
@@ -243,9 +242,20 @@ void ACHeroCharacter::Equip()
 }
 
 
-
 void ACHeroCharacter::Attack()
 {
+	float mouseX;
+	float mouseY;
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetMousePosition(mouseX, mouseY);
+	FVector2D MousePos = FVector2D(mouseX, mouseY);
+	
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		FVector2D ScreenLocation;
+		PlayerController->ProjectWorldLocationToScreen(GetActorLocation(), ScreenLocation);
+		FRotator LookAtRotator = UKismetMathLibrary::FindLookAtRotation(FVector(ScreenLocation.X, ScreenLocation.Y, 0.f), FVector(MousePos.X,MousePos.Y,0.f));
+		SetActorRotation(FRotator(0.f,LookAtRotator.Yaw + 135.f, 0.f));
+	}
 	IsAttacking = true;
 	if (AttackHandle.IsValid())
 	{
@@ -345,7 +355,7 @@ void ACHeroCharacter::SaveDelegate(const FString& SlotName, int UserIndex, bool 
 
 void ACHeroCharacter::CastFirstSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance->Montage_IsPlaying(FirstSkillSlotComponent->GetSkillMontage()))
@@ -361,13 +371,13 @@ void ACHeroCharacter::CastFirstSkill()
 
 void ACHeroCharacter::SpawnFirstSkill()
 {
-	if(IsStagger) return;
-	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
+	if (IsStagger) return;
+	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
 
 void ACHeroCharacter::CastSecondSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance->Montage_IsPlaying(SecondSkillSlotComponent->GetSkillMontage()))
@@ -383,14 +393,14 @@ void ACHeroCharacter::CastSecondSkill()
 
 void ACHeroCharacter::SpawnSecondSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
-	SecondSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
+	SecondSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
 
 void ACHeroCharacter::CastUltimateSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance->Montage_IsPlaying(UltimateSkillSlotComponent->GetSkillMontage()))
@@ -406,14 +416,14 @@ void ACHeroCharacter::CastUltimateSkill()
 
 void ACHeroCharacter::SpawnUltimateSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
-	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
+	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
 
 void ACHeroCharacter::CheckAttack()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
