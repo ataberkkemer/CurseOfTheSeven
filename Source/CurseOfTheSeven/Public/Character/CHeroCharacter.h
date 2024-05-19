@@ -31,6 +31,8 @@ public:
 	ACHeroCharacter();
 	virtual void Tick(float DeltaTime) override;
 	void SecondaryAttack();
+	void KeyboardKeyPressed();
+	void GamepadKeyPressed();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	//Getter Functions
@@ -158,11 +160,26 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* UltimateSkillAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* KeyboardAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* GamepadAction;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combat, meta = (AllowPrivateAccess = "true"))
 	UAnimMontage* SpecialAttackMontage;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dash, meta = (AllowPrivateAccess = "true"))
 	float DashLimit;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dash, meta = (AllowPrivateAccess = "true"))
+	float CurrentDashCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dash, meta = (AllowPrivateAccess = "true"))
+	float DashRechargeRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Dash, meta = (AllowPrivateAccess = "true"))
+	float DashTimer;
 	/// Components
 	UPROPERTY(VisibleAnywhere)
 	UAnimationComponent* AnimationComponent;
@@ -182,5 +199,7 @@ private:
 	
 	void ShakeCamera();
 	float GetMovementAngle();
+	void StartDashTimer(float DeltaTime);
 
+	bool IsKeyboard = false;
 };

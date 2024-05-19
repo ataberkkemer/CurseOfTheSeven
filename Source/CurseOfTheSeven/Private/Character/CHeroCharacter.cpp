@@ -80,11 +80,34 @@ void ACHeroCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	if (CurrentDashCount < DashLimit)
+	{
+		StartDashTimer(DeltaTime);
+	}
+
 	CheckAttack();
 }
 
 void ACHeroCharacter::SecondaryAttack()
 {
+}
+
+void ACHeroCharacter::KeyboardKeyPressed()
+{
+	IsKeyboard = true;
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		PlayerController->SetShowMouseCursor(true);
+	}
+}
+
+void ACHeroCharacter::GamepadKeyPressed()
+{
+	IsKeyboard = false;
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		PlayerController->SetShowMouseCursor(false);
+	}
 }
 
 void ACHeroCharacter::BeginPlay()
@@ -104,6 +127,8 @@ void ACHeroCharacter::BeginPlay()
 	FirstSkillSlotComponent->Equip(this, this);
 	SecondSkillSlotComponent->Equip(this, this);
 	UltimateSkillSlotComponent->Equip(this, this);
+
+	CurrentDashCount = DashLimit;
 	Tags.Add(FName("EngageableTarget"));
 }
 
@@ -151,6 +176,17 @@ float ACHeroCharacter::GetMovementAngle()
 	return Angle;
 }
 
+void ACHeroCharacter::StartDashTimer(float DeltaTime)
+{
+	if (DashTimer < DashRechargeRate)
+	{
+		DashTimer += DeltaTime;
+		return;
+	}
+	DashTimer = 0.f;
+	CurrentDashCount++;
+}
+
 void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
@@ -166,6 +202,8 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(UltimateSkillAction, ETriggerEvent::Triggered, this,
 		                                   &ACHeroCharacter::CastUltimateSkill);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
+		EnhancedInputComponent->BindAction(KeyboardAction, ETriggerEvent::Triggered, this,
+		                                   &ACHeroCharacter::KeyboardKeyPressed);
 		EnhancedInputComponent->BindAction(SecondaryAttackAction, ETriggerEvent::Triggered, this,
 		                                   &ACHeroCharacter::SecondaryAttack);
 	}
@@ -211,6 +249,10 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 void ACHeroCharacter::Dash()
 {
+	if (CurrentDashCount <= 0)
+	{
+		return;
+	}
 	SetActorRotation(FRotator(0.f, GetMovementAngle(), 0.f), ETeleportType::None);
 	IsDashing = true;
 	FTimerHandle UnusedHandle;
@@ -218,6 +260,7 @@ void ACHeroCharacter::Dash()
 	                                AnimationComponent->GetDashTime() - 0.05f, false);
 	AnimationComponent->Dash(this, FVector(MovementVector.Y, MovementVector.X, 0.f).GetSafeNormal() * 300.f);
 	EquippedWeapon->SetActorHiddenInGame(true);
+	CurrentDashCount--;
 }
 
 void ACHeroCharacter::ResetDash()
@@ -244,18 +287,23 @@ void ACHeroCharacter::Equip()
 
 void ACHeroCharacter::Attack()
 {
-	float mouseX;
-	float mouseY;
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetMousePosition(mouseX, mouseY);
-	FVector2D MousePos = FVector2D(mouseX, mouseY);
-	
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (IsKeyboard)
 	{
-		FVector2D ScreenLocation;
-		PlayerController->ProjectWorldLocationToScreen(GetActorLocation(), ScreenLocation);
-		FRotator LookAtRotator = UKismetMathLibrary::FindLookAtRotation(FVector(ScreenLocation.X, ScreenLocation.Y, 0.f), FVector(MousePos.X,MousePos.Y,0.f));
-		SetActorRotation(FRotator(0.f,LookAtRotator.Yaw + 135.f, 0.f));
+		float mouseX;
+		float mouseY;
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetMousePosition(mouseX, mouseY);
+		FVector2D MousePos = FVector2D(mouseX, mouseY);
+
+		if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+		{
+			FVector2D ScreenLocation;
+			PlayerController->ProjectWorldLocationToScreen(GetActorLocation(), ScreenLocation);
+			FRotator LookAtRotator = UKismetMathLibrary::FindLookAtRotation(
+				FVector(ScreenLocation.X, ScreenLocation.Y, 0.f), FVector(MousePos.X, MousePos.Y, 0.f));
+			SetActorRotation(FRotator(0.f, LookAtRotator.Yaw + 135.f, 0.f));
+		}
 	}
+
 	IsAttacking = true;
 	if (AttackHandle.IsValid())
 	{
