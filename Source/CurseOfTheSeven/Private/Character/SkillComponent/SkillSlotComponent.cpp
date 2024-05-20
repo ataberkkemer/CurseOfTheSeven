@@ -30,6 +30,7 @@ void USkillSlotComponent::SpawnSkill(FVector Position, FRotator Rotation, AActor
 	if (OwnerActor->GetWorld() && SlotSkill)
 	{
 		ABaseSkill* SpawnedSkill = OwnerActor->GetWorld()->SpawnActor<ABaseSkill>(SlotSkill, Position, Rotation);
+		
 		SpawnedSkill->DisableActor(true);
 		SpawnedSkill->Equip(NewOwner,NewInstigator);
 		SpawnedSkill->DisableActor(false);

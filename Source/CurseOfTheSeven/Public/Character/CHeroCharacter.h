@@ -48,12 +48,17 @@ public:
 
 	void ResetStagger();
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void Die() override;
 
 	UFUNCTION(BlueprintCallable)
 	void CameraMovementAnimation();
 
 	UFUNCTION(BlueprintCallable)
 	void CameraPostProcessAnimation();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void RestartGameEvent();
 
 protected:
 	void Move(const FInputActionValue& Value);

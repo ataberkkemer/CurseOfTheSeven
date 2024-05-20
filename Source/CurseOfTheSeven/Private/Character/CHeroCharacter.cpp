@@ -11,6 +11,7 @@
 #include "InputActionValue.h"
 #include "LegacyCameraShake.h"
 #include "NiagaraComponent.h"
+#include "Character/Components/AttributeComponent.h"
 #include "Character/SkillComponent/SkillSlotComponent.h"
 #include "Components/BoxComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
@@ -159,6 +160,48 @@ void ACHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 
 	// PlayHitSound(ImpactPoint);
 	// SpawnHitParticles(ImpactPoint);
+}
+
+float ACHeroCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	if (Attributes)
+	{
+		Attributes->ReceiveDamage(DamageAmount);
+	}
+	return DamageAmount;
+
+}
+
+void ACHeroCharacter::Die()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+
+		const int32 Selection = FMath::RandRange(0, 1);
+		FName SectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			DeathPose = EDeathPose::EDP_DeathA;
+			SectionName = FName("Death1");
+			break;
+		case 1:
+			DeathPose = EDeathPose::EDP_DeathB;
+			SectionName = FName("Death2");
+			break;
+		default:
+			break;
+		}
+
+		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
+	}
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::RestartGameEvent,2.f, false);
 }
 
 float ACHeroCharacter::GetMovementAngle()

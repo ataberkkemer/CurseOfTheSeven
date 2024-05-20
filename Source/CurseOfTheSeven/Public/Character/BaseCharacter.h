@@ -34,6 +34,7 @@ public:
 
 	virtual void Attack();
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	
 	bool IsAlive();
 
 	virtual void Die();
