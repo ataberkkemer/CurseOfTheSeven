@@ -126,6 +126,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<ULegacyCameraShake> CameraShake;
 	
+	UPROPERTY(EditAnywhere, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ULegacyCameraShake> CameraShakeSkill;
+	
 	UPROPERTY(EditAnywhere, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UNiagaraComponent* DashVFX;
 
@@ -203,6 +206,7 @@ private:
 	
 	
 	void ShakeCamera();
+	void ShakeCameraSkill();
 	float GetMovementAngle();
 	void StartDashTimer(float DeltaTime);
 

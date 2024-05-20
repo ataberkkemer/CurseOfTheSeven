@@ -138,6 +138,11 @@ void ACHeroCharacter::ShakeCamera()
 	GetLocalViewingPlayerController()->ClientStartCameraShake(CameraShake);
 }
 
+void ACHeroCharacter::ShakeCameraSkill()
+{
+	GetLocalViewingPlayerController()->ClientStartCameraShake(CameraShakeSkill);
+}
+
 void ACHeroCharacter::ResetStagger()
 {
 	IsStagger = false;
@@ -458,11 +463,14 @@ void ACHeroCharacter::CastFirstSkill()
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnFirstSkill,
 	                                FirstSkillSlotComponent->GetDelay(), false);
+
+	
 }
 
 void ACHeroCharacter::SpawnFirstSkill()
 {
 	if (IsStagger) return;
+	ShakeCameraSkill();
 	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
 
@@ -485,7 +493,7 @@ void ACHeroCharacter::CastSecondSkill()
 void ACHeroCharacter::SpawnSecondSkill()
 {
 	if (IsStagger) return;
-
+	ShakeCameraSkill();
 	SecondSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
 
@@ -508,6 +516,7 @@ void ACHeroCharacter::CastUltimateSkill()
 void ACHeroCharacter::SpawnUltimateSkill()
 {
 	if (IsStagger) return;
+	ShakeCameraSkill();
 
 	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
