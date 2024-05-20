@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Character/CHeroCharacter.h"
+#include "Character/Enemy/BaseEnemy.h"
 #include "Components/ArrowComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -42,52 +43,53 @@ void AEnemyProjectileSkill::OnSphereOverlap(UPrimitiveComponent* OverlappedCompo
 		}
 		if (ActorIsSameType(OtherActor)) return;
 				ACHeroCharacter* Hero = Cast<ACHeroCharacter>(OtherActor);
-
-		if (!Hero && HitEffect)
+				ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor);
+	
+		if (!Hero && HitEffect && !Enemy)
 		{
 			HitParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 				GetWorld(), HitEffect, SweepResult.ImpactPoint);
-
+	
 			HitParticleInstance->Activate();
 			DRAW_TEXT_ONSCREEN(HitParticleInstance->GetName());
 			Destroy();
 			return;
 		}
 		APawn* Ins = GetInstigator();
-
+	
 		if (!Ins)
 		{
 			return;
 		}
-
+	
 		FHitResult SphereHit;
 		SphereTrace(SphereHit);
-
+	
 		if (SphereHit.GetActor())
 		{
 			if (ActorIsSameType(SphereHit.GetActor())) return;
-
+	
 			UGameplayStatics::ApplyDamage(SphereHit.GetActor(), Attributes->GetRawDamage(), GetInstigator()->GetController(), this,
 							  UDamageType::StaticClass());
 			ExecuteGetHit(SphereHit);
-
+	
 			if(IsMultipleHitSkill)
 			{
 				FTimerHandle UniqueHandle;
 				FTimerDelegate RespawnDelegate = FTimerDelegate::CreateUObject( this, &ABaseSkill::ExecuteMultipleHitTry, SphereHit);
 				GetWorldTimerManager().SetTimer( UniqueHandle, RespawnDelegate, 0.25f, true, false );
 			}
-
+	
 			DRAW_TEXT_ONSCREEN(TEXT("Hit"));
 			
 			// CreateFields(SphereHit.ImpactPoint);
 		}
-
+	
 		if (HitEffect && GetWorld())
 		{
 			HitParticleInstance = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
 				GetWorld(), HitEffect, SweepResult.ImpactPoint);
-
+	
 			HitParticleInstance->Activate();
 			DRAW_TEXT_ONSCREEN(HitParticleInstance->GetName());
 		}

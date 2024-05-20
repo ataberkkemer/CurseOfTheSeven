@@ -5,6 +5,7 @@
 
 #include "Character/AI/BaseAIComponent.h"
 #include "Character/SkillComponent/SkillSlotComponent.h"
+#include "CurseOfTheSeven/DebugMacros.h"
 #include "Kismet/KismetMathLibrary.h"
 
 AArcherSkeletonEnemy::AArcherSkeletonEnemy()
@@ -30,7 +31,22 @@ void AArcherSkeletonEnemy::Attack()
 
 void AArcherSkeletonEnemy::SpawnSkill()
 {
-	SkillSlotComponent->SpawnSkill(ArrowCastPoint->GetComponentLocation(), GetActorRotation(), this, this);
+	if (GetWorld() && SkillSlotComponent->GetSkill())
+	{
+		ABaseSkill* SpawnedSkill = GetWorld()->SpawnActor<ABaseSkill>(SkillSlotComponent->GetSkill(), ArrowCastPoint->GetComponentLocation(), GetActorRotation());
+		if(!SpawnedSkill)
+		{
+			DRAW_TEXT_ONSCREEN(TEXT("No Arrrow"));
+			return;
+		}
+		
+		SpawnedSkill->DisableActor(true);
+		SpawnedSkill->Equip(this,this);
+		SpawnedSkill->DisableActor(false);
+		SpawnedSkill->SetAttributes(SkillSlotComponent->GetAttributeData().RawDamage, SkillSlotComponent->GetAttributeData().ElementalDamage, SkillSlotComponent->GetAttributeData().ElementalTickInterval, SkillSlotComponent->GetAttributeData().StaggerDamage);
+
+	}
+	// SkillSlotComponent->SpawnSkill(ArrowCastPoint->GetComponentLocation(), GetActorRotation(), this, this);
 }
 
 void AArcherSkeletonEnemy::Die()

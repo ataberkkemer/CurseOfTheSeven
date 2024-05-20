@@ -8,6 +8,7 @@
 #include "Character/SkillComponent/SkillSlotComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Skill/EnemyProjectileSkill.h"
 
 
 ALichEnemy::ALichEnemy()
@@ -72,7 +73,22 @@ void ALichEnemy::Die()
 
 void ALichEnemy::SpawnSkill()
 {
-	SkillSlotComponent->SpawnSkill(SkillCastPoint->GetComponentLocation(), GetActorRotation(), this, this);
+	if (GetWorld() && SlotSkill)
+	{
+		AEnemyProjectileSkill* SpawnedSkill = GetWorld()->SpawnActor<AEnemyProjectileSkill>(SlotSkill, SkillCastPoint->GetComponentLocation(), GetActorRotation());
+		if(!SpawnedSkill)
+		{
+			DRAW_TEXT_ONSCREEN(TEXT("No Arrrow"));
+			return;
+		}
+		
+		SpawnedSkill->DisableActor(true);
+		SpawnedSkill->Equip(this,this);
+		SpawnedSkill->DisableActor(false);
+		SpawnedSkill->SetAttributes(SkillSlotComponent->GetAttributeData().RawDamage, SkillSlotComponent->GetAttributeData().ElementalDamage, SkillSlotComponent->GetAttributeData().ElementalTickInterval, SkillSlotComponent->GetAttributeData().StaggerDamage);
+
+	}
+	//SkillSlotComponent->SpawnSkill(SkillCastPoint->GetComponentLocation(), GetActorRotation(), this, this);
 }
 
 void ALichEnemy::PlayAttackMontage()

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "SkeletonEnemy.h"
 #include "Character/Enemy/BaseEnemy.h"
+#include "Skill/EnemyProjectileSkill.h"
 #include "LichEnemy.generated.h"
 
 /**
@@ -43,6 +44,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* SkillCastPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AEnemyProjectileSkill> SlotSkill;
 
 	float SkillTimer;
 	float SpawnTimer;
