@@ -11,6 +11,7 @@
 #include "InputActionValue.h"
 #include "LegacyCameraShake.h"
 #include "NiagaraComponent.h"
+#include "Character/Components/AttributeComponent.h"
 #include "Character/SkillComponent/SkillSlotComponent.h"
 #include "Components/BoxComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
@@ -67,7 +68,7 @@ ACHeroCharacter::ACHeroCharacter()
 void ACHeroCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(IsStagger)
+	if (IsStagger)
 	{
 		Timer += DeltaTime;
 	}
@@ -80,11 +81,34 @@ void ACHeroCharacter::Tick(float DeltaTime)
 		}
 	}
 
+	if (CurrentDashCount < DashLimit)
+	{
+		StartDashTimer(DeltaTime);
+	}
+
 	CheckAttack();
 }
 
 void ACHeroCharacter::SecondaryAttack()
 {
+}
+
+void ACHeroCharacter::KeyboardKeyPressed()
+{
+	IsKeyboard = true;
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		PlayerController->SetShowMouseCursor(true);
+	}
+}
+
+void ACHeroCharacter::GamepadKeyPressed()
+{
+	IsKeyboard = false;
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		PlayerController->SetShowMouseCursor(false);
+	}
 }
 
 void ACHeroCharacter::BeginPlay()
@@ -98,18 +122,25 @@ void ACHeroCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+		PlayerController->SetShowMouseCursor(true);
 	}
 
 	FirstSkillSlotComponent->Equip(this, this);
 	SecondSkillSlotComponent->Equip(this, this);
 	UltimateSkillSlotComponent->Equip(this, this);
 
+	CurrentDashCount = DashLimit;
 	Tags.Add(FName("EngageableTarget"));
 }
 
 void ACHeroCharacter::ShakeCamera()
 {
 	GetLocalViewingPlayerController()->ClientStartCameraShake(CameraShake);
+}
+
+void ACHeroCharacter::ShakeCameraSkill()
+{
+	GetLocalViewingPlayerController()->ClientStartCameraShake(CameraShakeSkill);
 }
 
 void ACHeroCharacter::ResetStagger()
@@ -123,12 +154,12 @@ void ACHeroCharacter::ResetStagger()
 void ACHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
 	Super::GetHit_Implementation(ImpactPoint, Hitter);
-	if(StaggerHandle.IsValid())
+	if (StaggerHandle.IsValid())
 	{
 		StaggerHandle.Invalidate();
 	}
 	GetWorldTimerManager().SetTimer(StaggerHandle, this, &ACHeroCharacter::ResetStagger,
-									.8f, false);
+	                                .8f, false);
 	GetCharacterMovement()->MaxWalkSpeed = 0.f;
 	IsStagger = true;
 
@@ -136,19 +167,72 @@ void ACHeroCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 	// SpawnHitParticles(ImpactPoint);
 }
 
+float ACHeroCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+	AActor* DamageCauser)
+{
+	if (Attributes)
+	{
+		Attributes->ReceiveDamage(DamageAmount);
+	}
+	return DamageAmount;
+
+}
+
+void ACHeroCharacter::Die()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && DeathMontage)
+	{
+		AnimInstance->Montage_Play(DeathMontage);
+
+		const int32 Selection = FMath::RandRange(0, 1);
+		FName SectionName = FName();
+		switch (Selection)
+		{
+		case 0:
+			DeathPose = EDeathPose::EDP_DeathA;
+			SectionName = FName("Death1");
+			break;
+		case 1:
+			DeathPose = EDeathPose::EDP_DeathB;
+			SectionName = FName("Death2");
+			break;
+		default:
+			break;
+		}
+
+		AnimInstance->Montage_JumpToSection(SectionName, DeathMontage);
+	}
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FTimerHandle UnusedHandle;
+	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::RestartGameEvent,2.f, false);
+}
+
 float ACHeroCharacter::GetMovementAngle()
 {
 	float Angle = 0.f;
 	float DotProduct = UKismetMathLibrary::DotProduct2D(MovementVector, FVector2D(0.f, 1.f));
 
-		Angle = UKismetMathLibrary::DegAcos(DotProduct);
+	Angle = UKismetMathLibrary::DegAcos(DotProduct);
 	if (MovementVector.X < 0)
 	{
 		Angle *= -1;
 	}
-	
+
 	DRAW_TEXT_ONSCREEN(FString::Printf(TEXT("%f"), Angle));
 	return Angle;
+}
+
+void ACHeroCharacter::StartDashTimer(float DeltaTime)
+{
+	if (DashTimer < DashRechargeRate)
+	{
+		DashTimer += DeltaTime;
+		return;
+	}
+	DashTimer = 0.f;
+	CurrentDashCount++;
 }
 
 void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -166,6 +250,8 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(UltimateSkillAction, ETriggerEvent::Triggered, this,
 		                                   &ACHeroCharacter::CastUltimateSkill);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &ACHeroCharacter::Attack);
+		EnhancedInputComponent->BindAction(KeyboardAction, ETriggerEvent::Triggered, this,
+		                                   &ACHeroCharacter::KeyboardKeyPressed);
 		EnhancedInputComponent->BindAction(SecondaryAttackAction, ETriggerEvent::Triggered, this,
 		                                   &ACHeroCharacter::SecondaryAttack);
 	}
@@ -180,11 +266,11 @@ void ACHeroCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void ACHeroCharacter::Move(const FInputActionValue& Value)
 {
-	if(IsStagger)
+	if (IsStagger)
 	{
 		return;
 	}
-	
+
 	MovementVector = Value.Get<FVector2D>().GetRotated(-45.f).GetSafeNormal();
 	// DRAW_TEXT_ONSCREEN(MovementVector.ToString());
 	// float angle = GetMovementAngle();
@@ -211,6 +297,10 @@ void ACHeroCharacter::Move(const FInputActionValue& Value)
 
 void ACHeroCharacter::Dash()
 {
+	if (CurrentDashCount <= 0)
+	{
+		return;
+	}
 	SetActorRotation(FRotator(0.f, GetMovementAngle(), 0.f), ETeleportType::None);
 	IsDashing = true;
 	FTimerHandle UnusedHandle;
@@ -218,6 +308,7 @@ void ACHeroCharacter::Dash()
 	                                AnimationComponent->GetDashTime() - 0.05f, false);
 	AnimationComponent->Dash(this, FVector(MovementVector.Y, MovementVector.X, 0.f).GetSafeNormal() * 300.f);
 	EquippedWeapon->SetActorHiddenInGame(true);
+	CurrentDashCount--;
 }
 
 void ACHeroCharacter::ResetDash()
@@ -225,7 +316,6 @@ void ACHeroCharacter::ResetDash()
 	IsDashing = false;
 	IsAttacking = false;
 	EquippedWeapon->SetActorHiddenInGame(false);
-
 }
 
 void ACHeroCharacter::Equip()
@@ -243,9 +333,25 @@ void ACHeroCharacter::Equip()
 }
 
 
-
 void ACHeroCharacter::Attack()
 {
+	if (IsKeyboard)
+	{
+		float mouseX;
+		float mouseY;
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetMousePosition(mouseX, mouseY);
+		FVector2D MousePos = FVector2D(mouseX, mouseY);
+
+		if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+		{
+			FVector2D ScreenLocation;
+			PlayerController->ProjectWorldLocationToScreen(GetActorLocation(), ScreenLocation);
+			FRotator LookAtRotator = UKismetMathLibrary::FindLookAtRotation(
+				FVector(ScreenLocation.X, ScreenLocation.Y, 0.f), FVector(MousePos.X, MousePos.Y, 0.f));
+			SetActorRotation(FRotator(0.f, LookAtRotator.Yaw + 135.f, 0.f));
+		}
+	}
+
 	IsAttacking = true;
 	if (AttackHandle.IsValid())
 	{
@@ -345,7 +451,7 @@ void ACHeroCharacter::SaveDelegate(const FString& SlotName, int UserIndex, bool 
 
 void ACHeroCharacter::CastFirstSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance->Montage_IsPlaying(FirstSkillSlotComponent->GetSkillMontage()))
@@ -357,17 +463,20 @@ void ACHeroCharacter::CastFirstSkill()
 	FTimerHandle UnusedHandle;
 	GetWorldTimerManager().SetTimer(UnusedHandle, this, &ACHeroCharacter::SpawnFirstSkill,
 	                                FirstSkillSlotComponent->GetDelay(), false);
+
+	
 }
 
 void ACHeroCharacter::SpawnFirstSkill()
 {
-	if(IsStagger) return;
-	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
+	if (IsStagger) return;
+	ShakeCameraSkill();
+	FirstSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
 
 void ACHeroCharacter::CastSecondSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance->Montage_IsPlaying(SecondSkillSlotComponent->GetSkillMontage()))
@@ -383,14 +492,14 @@ void ACHeroCharacter::CastSecondSkill()
 
 void ACHeroCharacter::SpawnSecondSkill()
 {
-	if(IsStagger) return;
-
-	SecondSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
+	if (IsStagger) return;
+	ShakeCameraSkill();
+	SecondSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
 
 void ACHeroCharacter::CastUltimateSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance->Montage_IsPlaying(UltimateSkillSlotComponent->GetSkillMontage()))
@@ -406,14 +515,15 @@ void ACHeroCharacter::CastUltimateSkill()
 
 void ACHeroCharacter::SpawnUltimateSkill()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
+	ShakeCameraSkill();
 
-	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this ,this);
+	UltimateSkillSlotComponent->SpawnSkill(GetActorLocation(), GetActorRotation(), this, this);
 }
 
 void ACHeroCharacter::CheckAttack()
 {
-	if(IsStagger) return;
+	if (IsStagger) return;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
