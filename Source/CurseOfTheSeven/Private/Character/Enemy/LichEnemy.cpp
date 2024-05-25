@@ -8,6 +8,7 @@
 #include "Character/SkillComponent/SkillSlotComponent.h"
 #include "CurseOfTheSeven/DebugMacros.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Skill/EnemyProjectileSkill.h"
 
 
 ALichEnemy::ALichEnemy()
@@ -53,7 +54,7 @@ void ALichEnemy::SpawnSkeleton()
 	}
 	ASkeletonEnemy* SpawnedSkeleton = World->SpawnActor<ASkeletonEnemy>(SkeletonPrefab, SpawnPoint->GetComponentLocation() + FVector(0.f, 0.f, 200.f), GetActorRotation());
 	SpawnedSkeleton->SpawnAnimation();
-}
+ }
 
 void ALichEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
@@ -72,18 +73,32 @@ void ALichEnemy::Die()
 
 void ALichEnemy::SpawnSkill()
 {
-	SkillSlotComponent->SpawnSkill(SkillCastPoint->GetComponentLocation(), GetActorRotation(), this, this);
+	if (GetWorld() && SlotSkill)
+	{
+		AEnemyProjectileSkill* SpawnedSkill = GetWorld()->SpawnActor<AEnemyProjectileSkill>(SlotSkill, SkillCastPoint->GetComponentLocation(), GetActorRotation());
+		if(!SpawnedSkill)
+		{
+			DRAW_TEXT_ONSCREEN(TEXT("No Arrrow"));
+			return;
+		}
+		
+		SpawnedSkill->DisableActor(true);
+		SpawnedSkill->Equip(this,this);
+		SpawnedSkill->DisableActor(false);
+		SpawnedSkill->SetAttributes(SkillSlotComponent->GetAttributeData().RawDamage, SkillSlotComponent->GetAttributeData().ElementalDamage, SkillSlotComponent->GetAttributeData().ElementalTickInterval, SkillSlotComponent->GetAttributeData().StaggerDamage);
+
+	}
+	//SkillSlotComponent->SpawnSkill(SkillCastPoint->GetComponentLocation(), GetActorRotation(), this, this);
 }
 
 void ALichEnemy::PlayAttackMontage()
 {
 	Super::PlayAttackMontage();
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	DRAW_TEXT_ONSCREEN(TEXT("Attack"));
+	//DRAW_TEXT_ONSCREEN(TEXT("Attack"));
 
 	if(Attributes->GetHealthPercent() <= .5f)
 	{
-		DRAW_TEXT_ONSCREEN(TEXT("Normal Attack"));
 		
 		BaseAI->AttackRadius = 100.f;
 		if (AnimInstance && AttackMontage)
@@ -116,7 +131,6 @@ void ALichEnemy::PlayAttackMontage()
 
 	if(CheckSpawn())
 	{
-		DRAW_TEXT_ONSCREEN(TEXT("Spawn Attack"));
 
 		if (AnimInstance && SpawnMontage)
 		{
@@ -136,7 +150,6 @@ void ALichEnemy::PlayAttackMontage()
 
 	if(CheckSkills())
 	{
-		DRAW_TEXT_ONSCREEN(TEXT("Skill Attack"));
 
 		if (AnimInstance && SkillSlotComponent->GetSkillMontage())
 		{
@@ -145,7 +158,7 @@ void ALichEnemy::PlayAttackMontage()
 				return;
 			}
 			AnimInstance->Montage_Play(SkillSlotComponent->GetSkillMontage());
-
+		
 			FTimerHandle UnusedHandle;
 			GetWorldTimerManager().SetTimer(UnusedHandle, this, &ALichEnemy::SpawnSkill,
 											SkillSlotComponent->GetDelay(), false);

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "SkeletonEnemy.h"
 #include "Character/Enemy/BaseEnemy.h"
+#include "Skill/EnemyProjectileSkill.h"
 #include "LichEnemy.generated.h"
 
 /**
@@ -28,7 +29,7 @@ public:
 protected:
 	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;
 	virtual void Die() override;
-	void SpawnSkill();
+	void SpawnSkill() override;
 	virtual void PlayAttackMontage() override;
 	bool CheckSkills();
 	bool CheckSpawn();
@@ -43,6 +44,9 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* SkillCastPoint;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AEnemyProjectileSkill> SlotSkill;
 
 	float SkillTimer;
 	float SpawnTimer;

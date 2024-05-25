@@ -64,6 +64,12 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
+	
+	UPROPERTY(VisibleAnywhere)
+	AActor* OwnerActor = nullptr;
+
+	UPROPERTY(VisibleAnywhere)
+	APawn* InstigatorPawn = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USphereComponent* SphereCollision;
@@ -80,10 +86,11 @@ protected:
 	void ExecuteGetHit(FHitResult& SphereHit);
 	void RespawnPlayer(APlayerController* PlayerController);
 	void RespawnPlayerWithDelay(FHitResult Player);
-
-private:
+	
 	UPROPERTY(VisibleAnywhere, Category = "Hit Effects")
 	UNiagaraComponent* HitParticleInstance;
+
+private:
 
 	UPROPERTY(EditAnywhere)
 	float LifeSpan;

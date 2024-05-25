@@ -19,13 +19,14 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SpawnSkill(FVector Position, FRotator Rotation, AActor* NewOwner, APawn* NewInstigator);
-
 	void SetUpgrade(UNiagaraSystem* UpgradedParticle, float RawDamageMultiplier, float ElementalDamageMultiplier, float StaggerDamageMultiplier);
 	void SetSkill(ABaseSkill* BaseSkill);
 	void Equip(AActor* NewOwner, APawn* NewIns);
 
 	FORCEINLINE UAnimMontage* GetSkillMontage() const;
 	FORCEINLINE float GetDelay() const;
+	FORCEINLINE TSubclassOf<ABaseSkill> GetSkill() const;
+	FORCEINLINE FAttributeData GetAttributeData() const;
 
 protected:
 	virtual void BeginPlay() override;

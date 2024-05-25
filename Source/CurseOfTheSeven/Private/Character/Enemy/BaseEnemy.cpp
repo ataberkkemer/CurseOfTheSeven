@@ -55,6 +55,10 @@ void ABaseEnemy::BeginPlay()
 	
 }
 
+void ABaseEnemy::SpawnSkill()
+{
+}
+
 // Called every frame
 void ABaseEnemy::Tick(float DeltaTime)
 {
@@ -65,7 +69,7 @@ void ABaseEnemy::Tick(float DeltaTime)
 		if (!InTargetRange(CombatTarget, CombatRadius))
 		{
 			CombatTarget = nullptr;
-			SetHealthBarVisibility(true);		
+			SetHealthBarVisibility(false);		
 		}
 	}
 }
@@ -95,7 +99,7 @@ void ABaseEnemy::ShowHealthBar()
 {
 	if (HealthBarWidget)
 	{
-		HealthBarWidget->SetVisibility(true);
+		HealthBarWidget->SetVisibility(false);
 	}
 }
 
@@ -204,10 +208,15 @@ void ABaseEnemy::SetHealthBarVisibility(const bool IsVisible) const
 	}
 }
 
+void ABaseEnemy::SetEnemyCollision(ECollisionEnabled::Type CollisionType)
+{
+	GetCapsuleComponent()->SetCollisionEnabled(CollisionType);
+}
+
 void ABaseEnemy::SetDead()
 {
 	SetHealthBarVisibility(false);	
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetEnemyCollision(ECollisionEnabled::NoCollision);
 	SetLifeSpan(2.f);
 }
 

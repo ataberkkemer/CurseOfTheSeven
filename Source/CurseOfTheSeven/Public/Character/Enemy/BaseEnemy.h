@@ -7,6 +7,7 @@
 #include "Character/CharacterTypes.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
+#include "Interfaces/KillableInterface.h"
 #include "BaseEnemy.generated.h"
 
 class USkillSlotComponent;
@@ -19,7 +20,7 @@ class UBaseAIComponent;
 class UAnimationComponent;
 
 UCLASS()
-class CURSEOFTHESEVEN_API ABaseEnemy : public ABaseCharacter
+class CURSEOFTHESEVEN_API ABaseEnemy : public ABaseCharacter, public IKillableInterface
 {
 	GENERATED_BODY()
 
@@ -39,15 +40,18 @@ public:
 	virtual void Attack() override;
 	virtual void DirectionalHitReact(const FVector& ImpactPoint) override;
 	virtual void SpawnAnimation();
+	
 	bool IsAttackPlaying();
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void SpawnSkill();
 	
 	
 	virtual void Die() override;
 
 	void SetHealthBarVisibility(const bool IsVisible) const;
+	void SetEnemyCollision(ECollisionEnabled::Type CollisionType);
 	void SetDead();
 
 	UPROPERTY(VisibleAnywhere)

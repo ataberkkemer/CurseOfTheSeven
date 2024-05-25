@@ -29,7 +29,18 @@ void USkillSlotComponent::SpawnSkill(FVector Position, FRotator Rotation, AActor
 {
 	if (OwnerActor->GetWorld() && SlotSkill)
 	{
-		ABaseSkill* SpawnedSkill = OwnerActor->GetWorld()->SpawnActor<ABaseSkill>(SlotSkill, Position, Rotation);
+		UWorld* World = OwnerActor->GetWorld();
+		if(!World)
+		{
+			DRAW_TEXT_ONSCREEN(TEXT("No Arrrow"));
+		}
+		ABaseSkill* SpawnedSkill = World->SpawnActor<ABaseSkill>(SlotSkill, Position, Rotation);
+		if(!SpawnedSkill)
+		{
+			DRAW_TEXT_ONSCREEN(TEXT("No Arrrow"));
+			return;
+		}
+		
 		SpawnedSkill->DisableActor(true);
 		SpawnedSkill->Equip(NewOwner,NewInstigator);
 		SpawnedSkill->DisableActor(false);
@@ -87,4 +98,14 @@ float USkillSlotComponent::GetDelay() const
 		return SlotSkill.GetDefaultObject()->Delay;
 	}
 	return 0.f;
+}
+
+TSubclassOf<ABaseSkill> USkillSlotComponent::GetSkill() const
+{
+	return SlotSkill;
+}
+
+FAttributeData USkillSlotComponent::GetAttributeData() const
+{
+	return AttributeData;
 }
