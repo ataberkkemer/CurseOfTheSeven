@@ -59,8 +59,23 @@ void ASkeletonEnemy::PlayAttackMontage()
 
 void ASkeletonEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 {
-	const FName Section("Hit");
-	PlayHitReactMontage(Section);
+	const int32 Selection = FMath::RandRange(0, 2);
+	FName SectionName = FName();
+	switch (Selection)
+	{
+	case 0:
+		SectionName = FName("Hit1");
+		break;
+	case 1:
+		SectionName = FName("Hit2");
+		break;
+	case 2:
+		SectionName = FName("Hit3");
+		break;
+	default:
+		break;
+	}
+	PlayHitReactMontage(SectionName);
 	BaseAI->SetStagger();
 
 }
